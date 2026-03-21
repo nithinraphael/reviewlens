@@ -1,7 +1,7 @@
 import { isRecord } from '@/lib/object'
 
 const kAnthropicCreditMessage =
-  'AI-generated analysis is temporarily unavailable because the Anthropic account is out of credits. ReviewLens will keep working with the built-in brief, but chat needs billing to be restored.'
+  'AI-generated analysis is temporarily unavailable because the AI provider account is out of credits. ReviewLens will keep working with the built-in brief, but chat needs billing to be restored.'
 
 const kAnthropicUnavailableMessage =
   'AI-generated analysis is temporarily unavailable right now. Please try again shortly.'
@@ -33,6 +33,8 @@ export const normalizeErrorMessage = (value: string) => {
 
   if (
     lower.includes('credit balance is too low') ||
+    lower.includes('quota exceeded') ||
+    lower.includes('resource has been exhausted') ||
     lower.includes('purchase credits') ||
     lower.includes('plans & billing')
   ) {
@@ -41,6 +43,8 @@ export const normalizeErrorMessage = (value: string) => {
 
   if (
     lower.includes('anthropic') ||
+    lower.includes('gemini') ||
+    lower.includes('google') ||
     lower.includes('overloaded') ||
     lower.includes('rate limit') ||
     lower.includes('invalid_request_error')

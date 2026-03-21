@@ -35,6 +35,7 @@ export const kReviewExtractionPrompt =
   'Extract all customer reviews including author name, star rating (1-5), review title, review body text, date posted, and whether it is a verified purchase.'
 
 const kDefaultMaxReviews = 100
+const kMaxScrapePages = 3
 
 const toReviewKey = ({ author, body, date }: TrustpilotReview) => `${author}:${date}:${body}`
 
@@ -45,6 +46,8 @@ export const getMaxReviews = () => {
   const parsedValue = Number.parseInt(rawValue, 10)
   return Number.isFinite(parsedValue) && parsedValue > 0 ? parsedValue : kDefaultMaxReviews
 }
+
+export const getMaxScrapePages = () => kMaxScrapePages
 
 export const isTrustpilotReviewUrl = (value: string) => {
   if (!URL.canParse(value)) return false

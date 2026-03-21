@@ -1,15 +1,17 @@
-import { anthropic } from '@ai-sdk/anthropic'
+import { google } from '@ai-sdk/google'
 import { convertToModelMessages, streamText, type UIMessage } from 'ai'
 import { Flip } from '@reachdesign/flip'
 import { NextResponse } from 'next/server'
 import { getChatFallbackMessage, normalizeErrorMessage } from '@/lib/errorMessages'
 import { checkGuardrails } from '@/lib/guardrails'
 import { parseJson } from '@/lib/json'
+import { createRouteLogger } from '@/lib/logger'
 import { getUIMessageText } from '@/lib/messages'
 import { getSystemPrompt } from '@/lib/prompts'
 import type { ChatRequestBody } from '@/types'
 
 export const maxDuration = 30
+const kModel = 'gemini-2.5-flash'
 
 const getBlockedMessage = (mode: ChatRequestBody['mode']) =>
   mode === 'exec'
@@ -27,34 +29,62 @@ const stripMessageIds = (messages: readonly UIMessage[]) =>
   })
 
 export const POST = async (request: Request) => {
+  const requestId = crypto.randomUUID()
+  const requestLogger = createRouteLogger('/api/chat', requestId)
+  const startedAt = Date.now()
+
+  requestLogger.info({ event: 'request_received' }, 'Incoming chat request')
   const body = await request.text().then((value) => parseJson<ChatRequestBody>(value))
   if (Flip.isErr(body)) {
+    requestLogger.warn({ event: 'invalid_request_body' }, 'Chat request body was invalid')
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
   }
 
   const { messages, mode, reviews } = Flip.v(body)
+  requestLogger.info(
+    { event: 'chat_context_ready', mode, messageCount: messages.length, reviewCount: reviews.length },
+    'Chat request context prepared',
+  )
   const latestUserMessage = getLatestUserMessage(messages)
   const latestUserText = latestUserMessage ? getUIMessageText(latestUserMessage) : ''
   const guardrailResult = checkGuardrails(latestUserText)
 
   if (Flip.isErr(guardrailResult)) {
+    requestLogger.warn(
+      { event: 'guardrail_blocked', reason: Flip.e(guardrailResult), durationMs: Date.now() - startedAt },
+      'Chat request blocked by guardrails',
+    )
     return NextResponse.json({ error: getBlockedMessage(mode) }, { status: 400 })
   }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
+  if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+    requestLogger.error(
+      { event: 'chat_unavailable', reason: 'missing_google_api_key', durationMs: Date.now() - startedAt },
+      'Chat request rejected because the Google API key is missing',
+    )
     return NextResponse.json({ error: getChatFallbackMessage() }, { status: 503 })
   }
 
   const modelMessages = await convertToModelMessages(stripMessageIds(messages))
+  requestLogger.info(
+    { event: 'chat_stream_started', model: kModel, durationMs: Date.now() - startedAt },
+    'Starting Gemini chat stream',
+  )
   const result = streamText({
-    model: anthropic('claude-sonnet-4-20250514'),
+    model: google(kModel),
     system: getSystemPrompt(mode, reviews),
     messages: modelMessages,
     maxOutputTokens: 900,
   })
 
   return result.toUIMessageStreamResponse({
-    onError: (error) =>
-      normalizeErrorMessage(error instanceof Error ? error.message : 'AI chat is unavailable'),
+    onError: (error) => {
+      const message = normalizeErrorMessage(error instanceof Error ? error.message : 'AI chat is unavailable')
+      requestLogger.error(
+        { event: 'chat_stream_error', error: message, durationMs: Date.now() - startedAt },
+        'Gemini chat stream failed',
+      )
+      return message
+    },
   })
 }
