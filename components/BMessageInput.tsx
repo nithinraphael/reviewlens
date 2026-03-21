@@ -23,9 +23,9 @@ export const BMessageInput: FC<BMessageInputProps> = ({
   }
 
   return (
-    <div className="rounded-[1.75rem] border border-white/10 bg-[linear-gradient(180deg,rgba(9,9,11,0.9),rgba(9,9,11,0.78))] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+    <div className="rounded-[1.5rem] border border-black/8 bg-white p-3">
       <textarea
-        className="min-h-28 w-full resize-none bg-transparent p-3 text-sm leading-7 text-zinc-100 outline-none placeholder:text-zinc-500"
+        className="min-h-28 w-full resize-none bg-transparent p-3 text-sm leading-7 text-black outline-none placeholder:text-black/35"
         disabled={isDisabled}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
@@ -33,9 +33,9 @@ export const BMessageInput: FC<BMessageInputProps> = ({
         value={input}
       />
       <div className="flex items-center justify-between gap-3 px-3 pb-1">
-        <p className="text-xs text-zinc-500">Press Enter to send. Shift + Enter for a new line.</p>
+        <p className="text-xs text-black/38">Press Enter to send. Shift + Enter for a new line.</p>
         <motion.button
-          className="rounded-[1rem] bg-zinc-100 px-4 py-2 text-sm font-semibold text-zinc-950 transition hover:bg-white disabled:cursor-not-allowed disabled:bg-zinc-700 disabled:text-zinc-300"
+          className="rounded-[1rem] border border-black bg-black px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#1f1f1f] disabled:cursor-not-allowed disabled:border-black/10 disabled:bg-black/15 disabled:text-black/35"
           disabled={isDisabled}
           onClick={onSubmit}
           type="button"

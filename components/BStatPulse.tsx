@@ -12,9 +12,9 @@ interface BStatPulseProps {
 }
 
 const getToneClassName = (tone: BStatPulseProps['tone']) => {
-  if (tone === 'accent') return 'border-amber-300/20 bg-amber-300/10 text-amber-50'
-  if (tone === 'alert') return 'border-rose-300/20 bg-rose-300/10 text-rose-50'
-  return 'border-white/10 bg-white/[0.04] text-zinc-100'
+  if (tone === 'accent') return 'border-[#d6df57] bg-[#eef257] text-black'
+  if (tone === 'alert') return 'border-rose-200 bg-rose-50 text-rose-700'
+  return 'border-black/8 bg-[#f8f6f1] text-black'
 }
 
 export const BStatPulse: FC<BStatPulseProps> = ({
@@ -35,11 +35,11 @@ export const BStatPulse: FC<BStatPulseProps> = ({
 
   return (
     <motion.div
-      className={`rounded-[1.4rem] border px-4 py-3 shadow-[0_12px_40px_rgba(0,0,0,0.14)] ${getToneClassName(tone)}`}
+      className={`rounded-[1.4rem] border px-4 py-3 shadow-[0_12px_30px_rgba(0,0,0,0.04)] ${getToneClassName(tone)}`}
       initial={{ opacity: 0, y: 14 }}
       whileHover={{ y: -2 }}
     >
-      <div className="text-[10px] uppercase tracking-[0.25em] opacity-65">{label}</div>
+      <div className="text-[10px] uppercase tracking-[0.25em] opacity-55">{label}</div>
       <motion.div className="mt-2 text-2xl font-semibold">{rounded}</motion.div>
     </motion.div>
   )

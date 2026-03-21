@@ -1,7 +1,5 @@
 'use client'
 
-'use client'
-
 import { motion } from 'framer-motion'
 import type { ChangeEvent, FC, FormEvent } from 'react'
 import { useState } from 'react'
@@ -14,7 +12,6 @@ export const BUrlInput: FC = () => {
   const storedUrl = useReviewStore((state) => state.url)
   const [url, setUrl] = useState(storedUrl)
   const { ingest, isLoading, error } = useReviewIngest()
-  const isReady = isUrlValid(url.trim())
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setUrl(event.target.value)
@@ -33,59 +30,33 @@ export const BUrlInput: FC = () => {
   }
 
   return (
-    <form
-      className="relative flex flex-col gap-4 rounded-[2rem] border border-white/10 bg-white/[0.045] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur xl:flex-row xl:items-center"
-      onSubmit={handleSubmit}
-    >
-      <div className="flex-1">
-        <div className="mb-2 flex items-center justify-between gap-3">
-          <p className="text-xs uppercase tracking-[0.26em] text-zinc-400">Source URL</p>
-          <div className="flex items-center gap-2 text-xs">
-            <span
-              className={`rounded-full px-2.5 py-1 ${
-                isReady
-                  ? 'border border-emerald-300/20 bg-emerald-300/10 text-emerald-100'
-                  : 'border border-white/8 bg-white/[0.04] text-zinc-400'
-              }`}
-            >
-              {isReady ? 'Valid Trustpilot page' : 'Waiting for a valid review URL'}
-            </span>
+    <form className="w-full max-w-2xl" onSubmit={handleSubmit}>
+      <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
+        <div className="relative flex-1">
+          <div className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-black/35">
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-3.5-3.5" />
+            </svg>
           </div>
-        </div>
-        <div className="group relative">
-          <div className="pointer-events-none absolute inset-0 rounded-[1.35rem] bg-gradient-to-r from-amber-300/10 via-transparent to-cyan-300/10 opacity-0 blur-xl transition duration-500 group-focus-within:opacity-100" />
           <input
-            className="relative h-15 w-full rounded-[1.35rem] border border-white/10 bg-zinc-950/80 px-5 text-sm text-zinc-100 outline-none transition placeholder:text-zinc-500 focus:border-amber-300/45"
+            className="h-14 w-full rounded-[1.2rem] border border-black/8 bg-[#f3f0ea] pl-14 pr-5 text-[17px] text-black outline-none placeholder:text-black/38 focus:border-black/20"
             onChange={handleChange}
-            placeholder="https://www.trustpilot.com/review/example.com"
+            placeholder="Search or paste a Trustpilot review URL"
             value={url}
           />
         </div>
+        <motion.button
+          className="h-14 rounded-[1.1rem] border border-black/8 bg-white px-5 text-[15px] font-medium text-black shadow-[0_4px_14px_rgba(0,0,0,0.04)] disabled:cursor-not-allowed disabled:opacity-55"
+          disabled={isLoading}
+          type="submit"
+          whileHover={isLoading ? undefined : { y: -1 }}
+          whileTap={isLoading ? undefined : { scale: 0.985 }}
+        >
+          {isLoading ? 'Loading...' : 'Run analysis'}
+        </motion.button>
       </div>
-      <motion.button
-        className="relative h-15 overflow-hidden rounded-[1.35rem] bg-amber-300 px-6 text-sm font-semibold text-zinc-950 shadow-[0_12px_40px_rgba(251,191,36,0.2)] transition disabled:cursor-not-allowed disabled:bg-zinc-700 disabled:text-zinc-300 disabled:shadow-none"
-        disabled={isLoading}
-        type="submit"
-        whileHover={isLoading ? undefined : { y: -1, scale: 1.01 }}
-        whileTap={isLoading ? undefined : { scale: 0.985 }}
-      >
-        <motion.span
-          animate={isLoading ? { x: ['-120%', '120%'] } : { x: '-120%' }}
-          className="absolute inset-y-0 left-0 w-14 bg-white/30 blur-md"
-          transition={{ duration: 1.1, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
-        />
-        <span className="relative flex items-center gap-3">
-          {isLoading ? (
-            <motion.span
-              animate={{ rotate: 360 }}
-              className="h-4 w-4 rounded-full border-2 border-zinc-950/30 border-t-zinc-950"
-              transition={{ duration: 0.9, repeat: Number.POSITIVE_INFINITY, ease: 'linear' }}
-            />
-          ) : null}
-          {isLoading ? 'Building brief...' : 'Fetch reviews'}
-        </span>
-      </motion.button>
-      {error ? <p className="text-sm text-rose-300 xl:basis-full">{error}</p> : null}
+      {error ? <p className="mt-3 text-sm text-rose-600">{error}</p> : null}
     </form>
   )
 }

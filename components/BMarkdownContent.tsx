@@ -9,11 +9,11 @@ interface BMarkdownContentProps {
   readonly isUserMessage: boolean
 }
 
-const getTextTone = (isUserMessage: boolean) => (isUserMessage ? 'text-zinc-950' : 'text-zinc-100')
-const getMutedTone = (isUserMessage: boolean) => (isUserMessage ? 'text-zinc-800/80' : 'text-zinc-300')
-const getRuleTone = (isUserMessage: boolean) => (isUserMessage ? 'border-zinc-900/10' : 'border-white/10')
+const getTextTone = (isUserMessage: boolean) => (isUserMessage ? 'text-white' : 'text-black')
+const getMutedTone = (isUserMessage: boolean) => (isUserMessage ? 'text-white/82' : 'text-black/68')
+const getRuleTone = (isUserMessage: boolean) => (isUserMessage ? 'border-white/14' : 'border-black/10')
 const getCodeTone = (isUserMessage: boolean) =>
-  isUserMessage ? 'bg-zinc-950/10 text-zinc-950' : 'bg-white/8 text-zinc-100'
+  isUserMessage ? 'bg-white/12 text-white' : 'bg-black/5 text-black'
 
 export const BMarkdownContent: FC<BMarkdownContentProps> = ({ content, isUserMessage }) => (
   <div className={`markdown-body text-[15px] leading-8 ${getTextTone(isUserMessage)}`}>

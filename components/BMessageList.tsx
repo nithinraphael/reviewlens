@@ -8,8 +8,8 @@ import type { BMessageListProps } from '@/types'
 
 const getBubbleClassName = (role: string) =>
   role === 'user'
-    ? 'ml-auto border-amber-300/50 bg-[linear-gradient(180deg,#fde68a,#fbbf24)] text-zinc-950'
-    : 'mr-auto border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))] text-zinc-100'
+    ? 'ml-auto border-black bg-black text-white'
+    : 'mr-auto border-black/8 bg-white text-black'
 
 export const BMessageList: FC<BMessageListProps> = ({ messages, isStreaming }) => (
   <div className="flex min-h-64 flex-col gap-4">
@@ -39,7 +39,7 @@ export const BMessageList: FC<BMessageListProps> = ({ messages, isStreaming }) =
     {messages.length === 0 ? (
       <motion.div
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-[1.75rem] border border-dashed border-white/10 bg-white/[0.03] px-5 py-8 text-sm leading-7 text-zinc-400"
+        className="rounded-[1.75rem] border border-dashed border-black/10 bg-white px-5 py-8 text-sm leading-7 text-black/45"
         initial={{ opacity: 0, y: 16 }}
       >
         Ask for churn signals, recurring complaints, sentiment splits, or an executive summary of business risk and opportunity.
@@ -48,14 +48,14 @@ export const BMessageList: FC<BMessageListProps> = ({ messages, isStreaming }) =
     {isStreaming ? (
       <motion.div
         animate={{ opacity: 1, y: 0 }}
-        className="mr-auto flex items-center gap-3 rounded-[1.5rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))] px-4 py-3 text-sm text-zinc-300"
+        className="mr-auto flex items-center gap-3 rounded-[1.5rem] border border-black/8 bg-white px-4 py-3 text-sm text-black/55"
         initial={{ opacity: 0, y: 16 }}
       >
         <div className="flex gap-1">
           {[0, 1, 2].map((dot) => (
             <motion.span
               animate={{ y: [0, -4, 0], opacity: [0.45, 1, 0.45] }}
-              className="h-2 w-2 rounded-full bg-amber-300"
+              className="h-2 w-2 rounded-full bg-[#d9e94d]"
               key={dot}
               transition={{ duration: 0.8, delay: dot * 0.12, repeat: Number.POSITIVE_INFINITY }}
             />

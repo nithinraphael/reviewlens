@@ -1,8 +1,8 @@
 @import 'tailwindcss';
 
 :root {
-  --background: #09090b;
-  --foreground: #f4f4f5;
+  --background: #f6f4ef;
+  --foreground: #121212;
 }
 
 @theme inline {
@@ -37,9 +37,9 @@ body::before {
   inset: 0;
   pointer-events: none;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
-  background-size: 36px 36px;
-  mask-image: radial-gradient(circle at center, black, transparent 78%);
-  opacity: 0.24;
+    linear-gradient(rgba(18, 18, 18, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(18, 18, 18, 0.025) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(circle at center, black, transparent 82%);
+  opacity: 0.12;
 }
