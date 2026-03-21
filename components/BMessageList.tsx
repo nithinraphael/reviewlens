@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from 'framer-motion'
 import type { FC } from 'react'
+import { BMarkdownContent } from '@/components/BMarkdownContent'
 import { getUIMessageText } from '@/lib/messages'
 import type { BMessageListProps } from '@/types'
 
@@ -13,22 +14,27 @@ const getBubbleClassName = (role: string) =>
 export const BMessageList: FC<BMessageListProps> = ({ messages, isStreaming }) => (
   <div className="flex min-h-64 flex-col gap-4">
     <AnimatePresence initial={false}>
-      {messages.map((message) => (
-        <motion.div
-          animate={{ opacity: 1, y: 0 }}
-          className={`max-w-[85%] rounded-[1.5rem] border px-4 py-3 text-sm leading-7 shadow-[0_12px_40px_rgba(0,0,0,0.18)] ${getBubbleClassName(message.role)}`}
-          exit={{ opacity: 0, y: 10 }}
-          initial={{ opacity: 0, y: 16 }}
-          key={message.id}
-          transition={{ duration: 0.22 }}
-          whileHover={{ y: -1 }}
-        >
-          <div className="mb-2 text-[10px] uppercase tracking-[0.25em] opacity-65">
-            {message.role === 'user' ? 'You' : 'ReviewLens'}
-          </div>
-          {getUIMessageText(message)}
-        </motion.div>
-      ))}
+      {messages.map((message) => {
+        const content = getUIMessageText(message)
+        const isUserMessage = message.role === 'user'
+
+        return (
+          <motion.div
+            animate={{ opacity: 1, y: 0 }}
+            className={`max-w-[85%] rounded-[1.5rem] border px-4 py-3 text-sm leading-7 shadow-[0_12px_40px_rgba(0,0,0,0.18)] ${getBubbleClassName(message.role)}`}
+            exit={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 16 }}
+            key={message.id}
+            transition={{ duration: 0.22 }}
+            whileHover={{ y: -1 }}
+          >
+            <div className="mb-2 text-[10px] uppercase tracking-[0.25em] opacity-65">
+              {isUserMessage ? 'You' : 'ReviewLens'}
+            </div>
+            <BMarkdownContent content={content} isUserMessage={isUserMessage} />
+          </motion.div>
+        )
+      })}
     </AnimatePresence>
     {messages.length === 0 ? (
       <motion.div
