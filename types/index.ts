@@ -1,5 +1,4 @@
 import type { UIMessage } from 'ai'
-import type { RefObject } from 'react'
 
 export interface TrustpilotReview {
   readonly id: string
@@ -26,12 +25,14 @@ export interface ReviewStore {
   readonly url: string
   readonly reviews: readonly TrustpilotReview[]
   readonly brief: ReviewBrief | null
+  readonly chatMessages: readonly UIMessage[]
   readonly mode: AnalystMode
   readonly isLoading: boolean
   readonly error: string | null
   setUrl: (url: string) => void
   setReviews: (reviews: readonly TrustpilotReview[]) => void
   setBrief: (brief: ReviewBrief) => void
+  setChatMessages: (messages: readonly UIMessage[]) => void
   setMode: (mode: AnalystMode) => void
   setLoading: (loading: boolean) => void
   setError: (error: string | null) => void
@@ -76,8 +77,17 @@ export interface ChatRequestBody {
   readonly reviews: readonly TrustpilotReview[]
 }
 
+export interface ExportRequestBody {
+  readonly brief: ReviewBrief
+  readonly reviews: readonly TrustpilotReview[]
+  readonly messages: readonly UIMessage[]
+  readonly mode: AnalystMode
+}
+
 export interface BBriefPanelProps {
   readonly brief: ReviewBrief
+  readonly reviews: readonly TrustpilotReview[]
+  readonly onSeeAllReviews?: () => void
 }
 
 export interface BMessageListProps {
@@ -98,8 +108,11 @@ export interface BModeToggleProps {
 }
 
 export interface BExportButtonProps {
-  readonly targetRef: RefObject<HTMLElement | null>
   readonly isDisabled: boolean
+  readonly brief: ReviewBrief | null
+  readonly reviews: readonly TrustpilotReview[]
+  readonly messages: readonly UIMessage[]
+  readonly mode: AnalystMode
 }
 
 export interface BIngestLoaderProps {

@@ -22,6 +22,17 @@ body {
   box-sizing: border-box;
 }
 
+button,
+input,
+textarea {
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 220ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -42,4 +53,57 @@ body::before {
   background-size: 48px 48px;
   mask-image: radial-gradient(circle at center, black, transparent 82%);
   opacity: 0.12;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, rgba(18, 18, 18, 0.08) 1px, transparent 1.6px);
+  background-size: 18px 18px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.38), transparent 72%);
+  opacity: 0.22;
+}
+
+body[data-exporting='true'] [data-export-root='true'],
+body[data-exporting='true'] [data-export-root='true'] * {
+  box-shadow: none !important;
+  text-shadow: none !important;
+  background-image: none !important;
+  filter: none !important;
+}
+
+body[data-exporting='true'] [data-export-root='true'] {
+  background: #fbfaf7 !important;
+  color: #121212 !important;
+}
+
+body[data-exporting='true'] [data-export-root='true'] * {
+  border-color: rgba(18, 18, 18, 0.12) !important;
+  outline-color: rgba(18, 18, 18, 0.12) !important;
+  text-decoration-color: #121212 !important;
+}
+
+body[data-exporting='true'] [data-export-root='true'] section,
+body[data-exporting='true'] [data-export-root='true'] article,
+body[data-exporting='true'] [data-export-root='true'] table,
+body[data-exporting='true'] [data-export-root='true'] thead,
+body[data-exporting='true'] [data-export-root='true'] tbody,
+body[data-exporting='true'] [data-export-root='true'] tr,
+body[data-exporting='true'] [data-export-root='true'] td,
+body[data-exporting='true'] [data-export-root='true'] th,
+body[data-exporting='true'] [data-export-root='true'] button,
+body[data-exporting='true'] [data-export-root='true'] div {
+  color: #121212 !important;
+}
+
+body[data-exporting='true'] [data-export-root='true'] .bg-\[\#eef257\],
+body[data-exporting='true'] [data-export-root='true'] .bg-\[\#e8f255\],
+body[data-exporting='true'] [data-export-root='true'] .bg-\[\#f3f0ea\],
+body[data-exporting='true'] [data-export-root='true'] .bg-\[\#f5f3eb\],
+body[data-exporting='true'] [data-export-root='true'] .bg-\[\#f8f6f1\],
+body[data-exporting='true'] [data-export-root='true'] .bg-\[\#fbfaf7\],
+body[data-exporting='true'] [data-export-root='true'] .bg-white {
+  background-color: #ffffff !important;
 }

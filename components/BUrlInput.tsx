@@ -32,27 +32,34 @@ export const BUrlInput: FC = () => {
   return (
     <form className="w-full max-w-2xl" onSubmit={handleSubmit}>
       <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
-        <div className="relative flex-1">
-          <div className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-black/35">
+        <motion.div
+          className="group relative flex-1"
+          transition={{ duration: 0.22, ease: 'easeOut' }}
+          whileFocus={{ y: -1 }}
+          whileHover={{ y: -1 }}
+        >
+          <div className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-black/35 transition-colors duration-200">
             <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
               <circle cx="11" cy="11" r="7" />
               <path d="m20 20-3.5-3.5" />
             </svg>
           </div>
+          <div className="pointer-events-none absolute inset-0 rounded-[28px] bg-[radial-gradient(circle_at_left,rgba(232,242,85,0.24),transparent_34%)] opacity-0 transition-opacity duration-300 group-focus-within:opacity-100" />
           <input
-            className="h-14 w-full rounded-[1.2rem] border border-black/8 bg-[#f3f0ea] pl-14 pr-5 text-[17px] text-black outline-none placeholder:text-black/38 focus:border-black/20"
+            className="h-14 w-full rounded-[28px] border border-black/8 bg-[#f3f0ea] pl-14 pr-5 text-[17px] text-black shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] outline-none transition-[border-color,box-shadow,transform,background-color] duration-250 placeholder:text-black/38 focus:border-black/20 focus:shadow-[0_10px_30px_rgba(18,18,18,0.08),inset_0_1px_0_rgba(255,255,255,0.7)]"
             onChange={handleChange}
             placeholder="Search or paste a Trustpilot review URL"
             value={url}
           />
-        </div>
+        </motion.div>
         <motion.button
-          className="h-14 rounded-[1.1rem] border border-black/8 bg-white px-5 text-[15px] font-medium text-black shadow-[0_4px_14px_rgba(0,0,0,0.04)] disabled:cursor-not-allowed disabled:opacity-55"
+          className="group relative h-14 overflow-hidden rounded-[28px] border border-black/8 bg-white px-6 text-[15px] font-medium text-black shadow-[0_8px_22px_rgba(0,0,0,0.06)] transition-[box-shadow,background-color,border-color] duration-300 disabled:cursor-not-allowed disabled:opacity-55"
           disabled={isLoading}
           type="submit"
-          whileHover={isLoading ? undefined : { y: -1 }}
-          whileTap={isLoading ? undefined : { scale: 0.985 }}
+          whileHover={isLoading ? undefined : { y: -2, scale: 1.01 }}
+          whileTap={isLoading ? undefined : { scale: 0.98 }}
         >
+          <span className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,transparent_0%,rgba(255,255,255,0.7)_28%,transparent_58%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
           {isLoading ? 'Loading...' : 'Run analysis'}
         </motion.button>
       </div>

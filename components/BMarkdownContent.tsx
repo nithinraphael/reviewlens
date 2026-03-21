@@ -37,17 +37,17 @@ export const BMarkdownContent: FC<BMarkdownContentProps> = ({ content, isUserMes
         hr: () => <hr className={`my-5 ${getRuleTone(isUserMessage)}`} />,
         code: ({ children, className }) =>
           className ? (
-            <code className={`rounded-xl px-1.5 py-1 font-mono text-[13px] ${getCodeTone(isUserMessage)}`}>
+            <code className={`px-1.5 py-1 font-mono text-[13px] ${getCodeTone(isUserMessage)}`}>
               {children}
             </code>
           ) : (
-            <code className={`rounded-md px-1.5 py-1 font-mono text-[13px] ${getCodeTone(isUserMessage)}`}>
+            <code className={`px-1.5 py-1 font-mono text-[13px] ${getCodeTone(isUserMessage)}`}>
               {children}
             </code>
           ),
         pre: ({ children }) => (
           <pre
-            className={`my-4 overflow-x-auto rounded-2xl p-4 font-mono text-[13px] leading-6 ${getCodeTone(
+            className={`my-4 overflow-x-auto p-4 font-mono text-[13px] leading-6 ${getCodeTone(
               isUserMessage,
             )}`}
           >

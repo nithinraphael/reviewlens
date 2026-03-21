@@ -10,6 +10,7 @@
     "test": "jest --runInBand"
   },
   "dependencies": {
+    "@react-pdf/renderer": "^4.3.2",
     "@ai-sdk/google": "^3.0.52",
     "@ai-sdk/react": "^3.0.136",
     "@mendable/firecrawl-js": "^4.16.0",
