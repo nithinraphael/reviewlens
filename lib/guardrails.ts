@@ -111,7 +111,7 @@ export const isQueryInScope = async (
     'You are a strict binary classifier for a review-grounded QA system.',
     'Task: decide if the QUERY can be answered ONLY from the provided REVIEWS.',
     'Return exactly one token: IN_SCOPE or OUT_OF_SCOPE.',
-    'If ambiguous, underspecified, or requires outside knowledge, return OUT_OF_SCOPE.',
+    'Return OUT_OF_SCOPE only when the query clearly requires outside knowledge or is unrelated to the reviews.',
     'Do not output anything else.',
   ].join(' ')
   const user = `QUERY:\n${query}\n\nREVIEWS:\n${reviewSample}`

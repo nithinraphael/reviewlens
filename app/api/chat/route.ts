@@ -85,9 +85,8 @@ export const POST = async (request: Request) => {
   if (Flip.isErr(scopeResult)) {
     requestLogger.warn(
       { event: 'scope_blocked', reason: Flip.e(scopeResult), durationMs: Date.now() - startedAt },
-      'Chat request blocked by review-only scope guardrail',
+      'Scope classifier marked query out-of-scope; continuing with prompt-level guardrails',
     )
-    return NextResponse.json({ error: getBlockedMessage(mode) }, { status: 400 })
   }
 
   const embeddedReviews = await ensureReviewEmbeddings(reviews)
