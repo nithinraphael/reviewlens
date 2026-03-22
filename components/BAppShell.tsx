@@ -8,6 +8,7 @@ import { BChatPanel } from '@/components/BChatPanel'
 import { BExportButton } from '@/components/BExportButton'
 import { BIngestLoader } from '@/components/BIngestLoader'
 import { BModeToggle } from '@/components/BModeToggle'
+import { BTutorialModal } from '@/components/BTutorialModal'
 import { BUrlInput } from '@/components/BUrlInput'
 import { useReviewStore } from '@/store/reviewStore'
 import type { AnalystMode, TrustpilotReview } from '@/types'
@@ -78,6 +79,7 @@ export const BAppShell: FC = () => {
   const helpRef = useRef<HTMLElement>(null)
   const [activeSection, setActiveSection] = useState<SectionId>('dashboard')
   const [isChatOpen, setIsChatOpen] = useState(false)
+  const [isTutorialOpen, setIsTutorialOpen] = useState(false)
 
   useEffect(() => {
     const container = contentRef.current
@@ -152,6 +154,14 @@ export const BAppShell: FC = () => {
     setIsChatOpen((current) => !current)
   }
 
+  const handleOpenTutorial = () => {
+    setIsTutorialOpen(true)
+  }
+
+  const handleCloseTutorial = () => {
+    setIsTutorialOpen(false)
+  }
+
   return (
     <main className="h-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,_rgba(232,242,85,0.16),_transparent_22%),linear-gradient(180deg,#f7f4ed_0%,#f5f2eb_100%)] text-[#121212]">
       <div className="flex h-full w-full overflow-hidden bg-[#fbfaf7]">
@@ -192,6 +202,31 @@ export const BAppShell: FC = () => {
                 )
               })}
             </nav>
+            <motion.button
+              className="relative overflow-hidden rounded-[30px] border border-black/10 bg-[linear-gradient(180deg,#ffffff_0%,#f6f2ea_100%)] px-5 py-5 text-left shadow-[0_16px_36px_rgba(18,18,18,0.05)]"
+              onClick={handleOpenTutorial}
+              type="button"
+              whileHover={{ y: -2, scale: 1.01 }}
+              whileTap={{ scale: 0.985 }}
+            >
+              <div className="absolute inset-x-5 top-0 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.12)_1px,_transparent_1.4px)] bg-[length:8px_1px] bg-repeat-x opacity-75" />
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <div className="text-[11px] uppercase tracking-[0.34em] text-black/32">Tutorial</div>
+                  <div className="mt-3 text-[22px] font-medium tracking-tight text-black">See how it works</div>
+                  <p className="mt-2 text-[14px] leading-6 text-black/56">
+                    Animated walkthrough of the ingest, brief, chat, and export flow.
+                  </p>
+                </div>
+                <motion.div
+                  animate={{ x: [0, 3, 0], opacity: [0.6, 1, 0.6] }}
+                  className="mt-1 text-xl text-black/42"
+                  transition={{ duration: 1.8, repeat: Number.POSITIVE_INFINITY }}
+                >
+                  →
+                </motion.div>
+              </div>
+            </motion.button>
           </div>
         </aside>
 
@@ -449,6 +484,7 @@ export const BAppShell: FC = () => {
           </>
         ) : null}
       </AnimatePresence>
+      <BTutorialModal isOpen={isTutorialOpen} onClose={handleCloseTutorial} />
       <motion.button
         aria-label={isChatOpen ? 'Close chat panel' : 'Open chat panel'}
         className="fixed bottom-6 right-6 z-50 flex h-16 w-16 items-center justify-center rounded-full border border-black/10 bg-white text-[#2f1d63] shadow-[0_18px_44px_rgba(18,18,18,0.14)]"

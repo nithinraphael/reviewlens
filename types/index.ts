@@ -149,3 +149,8 @@ export interface BIngestLoaderProps {
 export interface BChatPanelProps {
   readonly isSidebar?: boolean
 }
+
+export interface BTutorialModalProps {
+  readonly isOpen: boolean
+  readonly onClose: () => void
+}
