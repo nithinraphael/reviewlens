@@ -12,7 +12,7 @@ import { ensureReviewEmbeddings, retrieveTopKReviews } from '@/lib/rag'
 import type { ChatRequestBody, LlmClient } from '@/types'
 
 export const maxDuration = 30
-const kModel = 'gemini-2.5-flash'
+const kModel = 'gemini-3-flash-preview'
 
 const getBlockedMessage = (mode: ChatRequestBody['mode']) =>
   mode === 'exec'
