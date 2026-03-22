@@ -4,7 +4,7 @@ import { Flip } from '@reachdesign/flip'
 import { toFlipError } from '@/lib/flip'
 import type { TrustpilotReview } from '@/types'
 
-const kEmbeddingModel = 'text-embedding-004'
+const kEmbeddingModel = 'gemini-embedding-001'
 const kDefaultTopKReviews = 5
 const kMaxReviewContextChars = 600
 
