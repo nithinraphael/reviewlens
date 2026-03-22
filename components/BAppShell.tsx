@@ -19,6 +19,11 @@ interface SidebarItem {
   readonly label: string
 }
 
+interface ObservedSection {
+  readonly id: SectionId
+  readonly element: HTMLElement | null
+}
+
 const kPanelMotion = {
   initial: { opacity: 0, y: 18 },
   animate: { opacity: 1, y: 0 },
@@ -33,11 +38,6 @@ const kSidebarItems: readonly SidebarItem[] = [
   { id: 'chat', label: 'Chat' },
   { id: 'exports', label: 'Exports' },
 ]
-
-const kFooterItems: readonly SidebarItem[] = [
-  { id: 'settings', label: 'Settings' },
-  { id: 'help', label: 'Help & Support' },
-] as const
 
 const toDisplayRating = (rating: number) => `${rating.toFixed(1).replace(/\.0$/, '')}/5`
 
@@ -69,29 +69,31 @@ export const BAppShell: FC = () => {
   const setMode = useReviewStore((state) => state.setMode)
 
   const contentRef = useRef<HTMLDivElement>(null)
+  const chatPanelRef = useRef<HTMLElement>(null)
   const dashboardRef = useRef<HTMLElement>(null)
   const reviewsRef = useRef<HTMLElement>(null)
   const briefingRef = useRef<HTMLElement>(null)
-  const chatRef = useRef<HTMLElement>(null)
   const exportsRef = useRef<HTMLElement>(null)
   const settingsRef = useRef<HTMLElement>(null)
   const helpRef = useRef<HTMLElement>(null)
   const [activeSection, setActiveSection] = useState<SectionId>('dashboard')
+  const [isChatOpen, setIsChatOpen] = useState(false)
 
   useEffect(() => {
     const container = contentRef.current
     if (!container) return
 
-    const sections = [
-      { id: 'dashboard' as const, element: dashboardRef.current },
-      { id: 'reviews' as const, element: reviewsRef.current },
-      { id: 'briefing' as const, element: briefingRef.current },
-      { id: 'chat' as const, element: chatRef.current },
-      { id: 'exports' as const, element: exportsRef.current },
-      { id: 'settings' as const, element: settingsRef.current },
-      { id: 'help' as const, element: helpRef.current },
+    const sections: readonly ObservedSection[] = [
+      { id: 'dashboard', element: dashboardRef.current },
+      { id: 'reviews', element: reviewsRef.current },
+      { id: 'briefing', element: briefingRef.current },
+      { id: 'exports', element: exportsRef.current },
+      { id: 'settings', element: settingsRef.current },
+      { id: 'help', element: helpRef.current },
     ]
-      .filter((section): section is { id: SectionId; element: HTMLElement } => Boolean(section.element))
+    const visibleSections = sections.filter(
+      (section): section is ObservedSection & { readonly element: HTMLElement } => section.element instanceof HTMLElement,
+    )
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -100,7 +102,7 @@ export const BAppShell: FC = () => {
           .sort((left, right) => right.intersectionRatio - left.intersectionRatio)[0]
 
         if (!visible) return
-        const match = sections.find(({ element }) => element === visible.target)
+        const match = visibleSections.find(({ element }) => element === visible.target)
         if (match) setActiveSection(match.id)
       },
       {
@@ -109,7 +111,7 @@ export const BAppShell: FC = () => {
       },
     )
 
-    sections.forEach(({ element }) => observer.observe(element))
+    visibleSections.forEach(({ element }) => observer.observe(element))
     return () => observer.disconnect()
   }, [])
 
@@ -118,11 +120,17 @@ export const BAppShell: FC = () => {
   }
 
   const scrollToSection = (sectionId: SectionId) => {
+    if (sectionId === 'chat') {
+      setIsChatOpen(true)
+      setActiveSection('chat')
+      return
+    }
+
     const refMap: Record<SectionId, RefObject<HTMLElement | null>> = {
       dashboard: dashboardRef,
       reviews: reviewsRef,
       briefing: briefingRef,
-      chat: chatRef,
+      chat: chatPanelRef,
       exports: exportsRef,
       settings: settingsRef,
       help: helpRef,
@@ -140,6 +148,10 @@ export const BAppShell: FC = () => {
     scrollToSection('dashboard')
   }
 
+  const handleToggleChat = () => {
+    setIsChatOpen((current) => !current)
+  }
+
   return (
     <main className="h-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,_rgba(232,242,85,0.16),_transparent_22%),linear-gradient(180deg,#f7f4ed_0%,#f5f2eb_100%)] text-[#121212]">
       <div className="flex h-full w-full overflow-hidden bg-[#fbfaf7]">
@@ -153,7 +165,7 @@ export const BAppShell: FC = () => {
           <div className="flex min-h-0 flex-1 flex-col justify-between px-4 py-5">
             <nav className="space-y-2">
               {kSidebarItems.map(({ id, label }, index) => {
-                const isActive = activeSection === id
+                const isActive = activeSection === id || (id === 'chat' && isChatOpen)
 
                 return (
                   <motion.button
@@ -180,24 +192,6 @@ export const BAppShell: FC = () => {
                 )
               })}
             </nav>
-            <div className="space-y-3 border-t border-black/8 px-2 pt-6 text-[17px] text-black/62">
-              {kFooterItems.map(({ id, label }) => (
-                <motion.button
-                  className="relative flex w-full items-center justify-between rounded-[22px] border border-transparent px-3 py-3 text-left transition hover:border-black/8 hover:bg-[#faf8f3]"
-                  key={id}
-                  onClick={() => scrollToSection(id)}
-                  type="button"
-                  whileHover={{ x: 3, y: -1 }}
-                  whileTap={{ scale: 0.985 }}
-                >
-                  <span className="absolute inset-x-3 top-0 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.11)_1px,_transparent_1.4px)] bg-[length:8px_1px] bg-repeat-x opacity-70" />
-                  <span>{label}</span>
-                  {id === 'help' ? (
-                    <span className="rounded-full bg-[#e8f255] px-2 py-0.5 text-sm text-black">8</span>
-                  ) : null}
-                </motion.button>
-              ))}
-            </div>
           </div>
         </aside>
 
@@ -228,93 +222,94 @@ export const BAppShell: FC = () => {
             </div>
           </header>
 
-          <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-6 py-7 lg:px-10" ref={contentRef}>
-            <section className="mb-10" ref={dashboardRef}>
-              <div className="mb-7 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-                <div>
-                  <p className="text-sm uppercase tracking-[0.28em] text-black/35">Insights</p>
-                  <h1 className="mt-1 text-5xl font-semibold tracking-tight text-black">Reporting</h1>
-                  <div className="mt-4 h-px w-52 bg-[radial-gradient(circle,_rgba(18,18,18,0.18)_1px,_transparent_1.5px)] bg-[length:10px_1px] bg-repeat-x" />
+          <div className="min-h-0 flex-1 overflow-hidden px-6 py-7 lg:px-10">
+            <div className="h-full min-h-0 min-w-0 overflow-y-auto overflow-x-hidden pr-1" ref={contentRef}>
+              <section className="mb-10" ref={dashboardRef}>
+                <div className="mb-7 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+                  <div>
+                    <p className="text-sm uppercase tracking-[0.28em] text-black/35">Insights</p>
+                    <h1 className="mt-1 text-5xl font-semibold tracking-tight text-black">Reporting</h1>
+                    <div className="mt-4 h-px w-52 bg-[radial-gradient(circle,_rgba(18,18,18,0.18)_1px,_transparent_1.5px)] bg-[length:10px_1px] bg-repeat-x" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                    <div className="relative overflow-hidden rounded-[24px] border border-black/8 bg-white px-4 py-3">
+                      <div className="absolute inset-x-4 top-3 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.13)_1px,_transparent_1.4px)] bg-[length:8px_1px] bg-repeat-x" />
+                      <div className="text-xs uppercase tracking-[0.2em] text-black/38">Mode</div>
+                      <div className="mt-2 text-xl font-semibold capitalize">{mode}</div>
+                    </div>
+                    <div className="relative overflow-hidden rounded-[24px] border border-black/8 bg-white px-4 py-3">
+                      <div className="absolute inset-x-4 top-3 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.13)_1px,_transparent_1.4px)] bg-[length:8px_1px] bg-repeat-x" />
+                      <div className="text-xs uppercase tracking-[0.2em] text-black/38">Reviews</div>
+                      <div className="mt-2 text-xl font-semibold">{reviews.length}</div>
+                    </div>
+                    <div className="relative overflow-hidden rounded-[24px] border border-black/8 bg-white px-4 py-3">
+                      <div className="absolute inset-x-4 top-3 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.13)_1px,_transparent_1.4px)] bg-[length:8px_1px] bg-repeat-x" />
+                      <div className="text-xs uppercase tracking-[0.2em] text-black/38">Status</div>
+                      <div className="mt-2 text-xl font-semibold">{brief ? 'Ready' : 'Waiting'}</div>
+                    </div>
+                    <div className="relative overflow-hidden rounded-[24px] border border-black/8 bg-[#f3f0ea] px-4 py-3">
+                      <div className="absolute inset-x-4 top-3 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.13)_1px,_transparent_1.4px)] bg-[length:8px_1px] bg-repeat-x" />
+                      <div className="text-xs uppercase tracking-[0.2em] text-black/38">Workspace</div>
+                      <div className="mt-2 text-xl font-semibold">Live</div>
+                    </div>
+                  </div>
                 </div>
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                  <div className="relative overflow-hidden rounded-[24px] border border-black/8 bg-white px-4 py-3">
-                    <div className="absolute inset-x-4 top-3 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.13)_1px,_transparent_1.4px)] bg-[length:8px_1px] bg-repeat-x" />
-                    <div className="text-xs uppercase tracking-[0.2em] text-black/38">Mode</div>
-                    <div className="mt-2 text-xl font-semibold capitalize">{mode}</div>
-                  </div>
-                  <div className="relative overflow-hidden rounded-[24px] border border-black/8 bg-white px-4 py-3">
-                    <div className="absolute inset-x-4 top-3 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.13)_1px,_transparent_1.4px)] bg-[length:8px_1px] bg-repeat-x" />
-                    <div className="text-xs uppercase tracking-[0.2em] text-black/38">Reviews</div>
-                    <div className="mt-2 text-xl font-semibold">{reviews.length}</div>
-                  </div>
-                  <div className="relative overflow-hidden rounded-[24px] border border-black/8 bg-white px-4 py-3">
-                    <div className="absolute inset-x-4 top-3 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.13)_1px,_transparent_1.4px)] bg-[length:8px_1px] bg-repeat-x" />
-                    <div className="text-xs uppercase tracking-[0.2em] text-black/38">Status</div>
-                    <div className="mt-2 text-xl font-semibold">{brief ? 'Ready' : 'Waiting'}</div>
-                  </div>
-                  <div className="relative overflow-hidden rounded-[24px] border border-black/8 bg-[#f3f0ea] px-4 py-3">
-                    <div className="absolute inset-x-4 top-3 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.13)_1px,_transparent_1.4px)] bg-[length:8px_1px] bg-repeat-x" />
-                    <div className="text-xs uppercase tracking-[0.2em] text-black/38">Workspace</div>
-                    <div className="mt-2 text-xl font-semibold">Live</div>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <div className="grid gap-6">
-              <section ref={reviewsRef}>
-                <motion.div {...kPanelMotion} className="relative overflow-hidden rounded-[34px] border border-black/10 bg-white p-6 shadow-[0_18px_50px_rgba(25,25,25,0.04)] lg:p-8">
-                  <div className="absolute left-0 right-0 top-0 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.15)_1px,_transparent_1.5px)] bg-[length:9px_1px] bg-repeat-x" />
-                  <div className="mb-5 flex items-center justify-between gap-3">
-                    <div>
-                      <p className="text-sm uppercase tracking-[0.28em] text-black/35">Reviews</p>
-                      <h2 className="mt-1 text-4xl font-semibold tracking-tight">Recent review feed</h2>
-                    </div>
-                    <div className="bg-[#e8f255] px-3 py-1 text-sm">{reviews.length}</div>
-                  </div>
-                  {reviews.length > 0 ? (
-                    <div className="overflow-hidden rounded-[26px] border border-black/8">
-                      <div className="grid grid-cols-[1fr_120px_140px_120px] border-b border-black/8 bg-[#f8f6f1] px-5 py-3 text-sm uppercase tracking-[0.2em] text-black/42">
-                        <div>Review</div>
-                        <div>Rating</div>
-                        <div>Date</div>
-                        <div>Status</div>
-                      </div>
-                      {reviews.slice(0, 10).map((review) => (
-                        <div
-                          className="relative grid grid-cols-[1fr_120px_140px_120px] border-t border-black/8 px-5 py-4 text-[15px]"
-                          key={review.id}
-                        >
-                          <div className="absolute inset-x-5 top-0 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.11)_1px,_transparent_1.5px)] bg-[length:8px_1px] bg-repeat-x opacity-80" />
-                          <div>
-                            <div className="font-medium text-black">{review.author}</div>
-                            <div className="mt-1 text-black/62">{getPreviewText(review)}</div>
-                          </div>
-                          <div className="font-medium text-black">{toDisplayRating(review.rating)}</div>
-                          <div className="text-black/62">{formatDate(review.date)}</div>
-                          <div>
-                            <span
-                              className={`rounded-full px-3 py-1 text-sm ${
-                                getStatusLabel(review) === 'Positive'
-                                  ? 'bg-[#eef5d2] text-[#48621b]'
-                                  : getStatusLabel(review) === 'Risk'
-                                    ? 'bg-[#f7e6df] text-[#8f4b33]'
-                                    : 'bg-[#f3f0ea] text-black/62'
-                              }`}
-                            >
-                              {getStatusLabel(review)}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="rounded-[26px] border border-dashed border-black/10 bg-[#fbfaf7] px-5 py-8 text-black/48">
-                      Run an analysis to populate the live review table.
-                    </div>
-                  )}
-                </motion.div>
               </section>
+
+              <div className="grid gap-6">
+                <section ref={reviewsRef}>
+                  <motion.div {...kPanelMotion} className="relative overflow-hidden rounded-[34px] border border-black/10 bg-white p-6 shadow-[0_18px_50px_rgba(25,25,25,0.04)] lg:p-8">
+                    <div className="absolute left-0 right-0 top-0 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.15)_1px,_transparent_1.5px)] bg-[length:9px_1px] bg-repeat-x" />
+                    <div className="mb-5 flex items-center justify-between gap-3">
+                      <div>
+                        <p className="text-sm uppercase tracking-[0.28em] text-black/35">Reviews</p>
+                        <h2 className="mt-1 text-4xl font-semibold tracking-tight">Recent review feed</h2>
+                      </div>
+                      <div className="bg-[#e8f255] px-3 py-1 text-sm">{reviews.length}</div>
+                    </div>
+                    {reviews.length > 0 ? (
+                      <div className="overflow-hidden rounded-[26px] border border-black/8">
+                        <div className="grid grid-cols-[1fr_120px_140px_120px] border-b border-black/8 bg-[#f8f6f1] px-5 py-3 text-sm uppercase tracking-[0.2em] text-black/42">
+                          <div>Review</div>
+                          <div>Rating</div>
+                          <div>Date</div>
+                          <div>Status</div>
+                        </div>
+                        {reviews.slice(0, 10).map((review) => (
+                          <div
+                            className="relative grid grid-cols-[1fr_120px_140px_120px] border-t border-black/8 px-5 py-4 text-[15px]"
+                            key={review.id}
+                          >
+                            <div className="absolute inset-x-5 top-0 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.11)_1px,_transparent_1.5px)] bg-[length:8px_1px] bg-repeat-x opacity-80" />
+                            <div>
+                              <div className="font-medium text-black">{review.author}</div>
+                              <div className="mt-1 text-black/62">{getPreviewText(review)}</div>
+                            </div>
+                            <div className="font-medium text-black">{toDisplayRating(review.rating)}</div>
+                            <div className="text-black/62">{formatDate(review.date)}</div>
+                            <div>
+                              <span
+                                className={`rounded-full px-3 py-1 text-sm ${
+                                  getStatusLabel(review) === 'Positive'
+                                    ? 'bg-[#eef5d2] text-[#48621b]'
+                                    : getStatusLabel(review) === 'Risk'
+                                      ? 'bg-[#f7e6df] text-[#8f4b33]'
+                                      : 'bg-[#f3f0ea] text-black/62'
+                                }`}
+                              >
+                                {getStatusLabel(review)}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="rounded-[26px] border border-dashed border-black/10 bg-[#fbfaf7] px-5 py-8 text-black/48">
+                        Run an analysis to populate the live review table.
+                      </div>
+                    )}
+                  </motion.div>
+                </section>
 
               <section ref={briefingRef}>
                 <AnimatePresence mode="popLayout">
@@ -337,12 +332,6 @@ export const BAppShell: FC = () => {
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </section>
-
-              <section ref={chatRef}>
-                <motion.div {...kPanelMotion}>
-                  <BChatPanel />
-                </motion.div>
               </section>
 
               <section ref={exportsRef}>
@@ -418,10 +407,77 @@ export const BAppShell: FC = () => {
                   </div>
                 </motion.div>
               </section>
+              </div>
             </div>
+
           </div>
         </section>
       </div>
+      <AnimatePresence initial={false}>
+        {isChatOpen ? (
+          <>
+            <motion.button
+              aria-label="Close chat panel"
+              className="fixed inset-0 z-40 bg-black/8 backdrop-blur-[2px]"
+              exit={{ opacity: 0 }}
+              initial={{ opacity: 0 }}
+              onClick={handleToggleChat}
+              type="button"
+              animate={{ opacity: 1 }}
+            />
+            <motion.section
+              animate={{ opacity: 1, x: 0 }}
+              className="fixed bottom-6 right-6 top-6 z-50 hidden w-[min(50vw,calc(100vw-5rem))] xl:block"
+              exit={{ opacity: 0, x: 28 }}
+              initial={{ opacity: 0, x: 28 }}
+              key="chat-overlay"
+              ref={chatPanelRef}
+              transition={{ duration: 0.24, ease: 'easeOut' }}
+            >
+              <motion.button
+                aria-label="Collapse chat panel"
+                className="absolute right-6 top-6 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-black/8 bg-white/94 text-black/60 shadow-[0_16px_30px_rgba(18,18,18,0.08)] backdrop-blur"
+                onClick={handleToggleChat}
+                type="button"
+                whileHover={{ y: -2, scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+              >
+                <span className="text-lg leading-none">×</span>
+              </motion.button>
+              <BChatPanel isSidebar />
+            </motion.section>
+          </>
+        ) : null}
+      </AnimatePresence>
+      <motion.button
+        aria-label={isChatOpen ? 'Close chat panel' : 'Open chat panel'}
+        className="fixed bottom-6 right-6 z-50 flex h-16 w-16 items-center justify-center rounded-full border border-black/10 bg-white text-[#2f1d63] shadow-[0_18px_44px_rgba(18,18,18,0.14)]"
+        onClick={handleToggleChat}
+        type="button"
+        whileHover={{ y: -3, scale: 1.03 }}
+        whileTap={{ scale: 0.98 }}
+      >
+        <motion.span
+          animate={{ scale: isChatOpen ? [1, 1.06, 1] : 1 }}
+          className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_top,rgba(143,107,255,0.16),transparent_60%)]"
+          transition={{ duration: 1.8, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
+        />
+        <svg
+          aria-hidden="true"
+          className="relative z-10 h-7 w-7"
+          fill="none"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1.8"
+          viewBox="0 0 24 24"
+        >
+          <path d="M7 10h10" />
+          <path d="M7 14h6" />
+          <path d="M5 19.2V6.8A1.8 1.8 0 0 1 6.8 5h10.4A1.8 1.8 0 0 1 19 6.8v7.4A1.8 1.8 0 0 1 17.2 16H9.5L5 19.2Z" />
+        </svg>
+        <span className="sr-only">Chat</span>
+      </motion.button>
       <BIngestLoader hasReviews={reviews.length > 0} isVisible={isLoading} />
     </main>
   )

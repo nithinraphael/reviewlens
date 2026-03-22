@@ -1,14 +1,14 @@
 import { google } from '@ai-sdk/google'
-import { convertToModelMessages, streamText, type UIMessage } from 'ai'
+import { convertToModelMessages, generateText, streamText, type UIMessage } from 'ai'
 import { Flip } from '@reachdesign/flip'
 import { NextResponse } from 'next/server'
 import { getChatFallbackMessage, normalizeErrorMessage } from '@/lib/errorMessages'
-import { checkGuardrails } from '@/lib/guardrails'
+import { checkGuardrails, isQueryInScope, sanitizeReviewContext } from '@/lib/guardrails'
 import { parseJson } from '@/lib/json'
 import { createRouteLogger } from '@/lib/logger'
 import { getUIMessageText } from '@/lib/messages'
 import { getSystemPrompt } from '@/lib/prompts'
-import type { ChatRequestBody } from '@/types'
+import type { ChatRequestBody, LlmClient } from '@/types'
 
 export const maxDuration = 30
 const kModel = 'gemini-2.5-flash'
@@ -27,6 +27,20 @@ const stripMessageIds = (messages: readonly UIMessage[]) =>
     void id
     return rest
   })
+
+const createScopeLlmClient = (): LlmClient => ({
+  generate: async ({ system, user, context, temperature }) => {
+    const result = await generateText({
+      model: google(kModel),
+      system,
+      prompt: `${context}\n\n${user}`,
+      temperature,
+      maxOutputTokens: 32,
+    })
+
+    return result.text
+  },
+})
 
 export const POST = async (request: Request) => {
   const requestId = crypto.randomUUID()
@@ -63,6 +77,16 @@ export const POST = async (request: Request) => {
       'Chat request rejected because the Google API key is missing',
     )
     return NextResponse.json({ error: getChatFallbackMessage() }, { status: 503 })
+  }
+
+  const scopeResult = await isQueryInScope(latestUserText, sanitizeReviewContext(reviews), createScopeLlmClient())
+
+  if (Flip.isErr(scopeResult)) {
+    requestLogger.warn(
+      { event: 'scope_blocked', reason: Flip.e(scopeResult), durationMs: Date.now() - startedAt },
+      'Chat request blocked by review-only scope guardrail',
+    )
+    return NextResponse.json({ error: getBlockedMessage(mode) }, { status: 400 })
   }
 
   const modelMessages = await convertToModelMessages(stripMessageIds(messages))

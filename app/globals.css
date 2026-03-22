@@ -33,6 +33,17 @@ textarea {
     transform 180ms ease;
 }
 
+button,
+[role='button'],
+a,
+summary,
+label[for],
+input[type='button'],
+input[type='submit'],
+input[type='reset'] {
+  cursor: pointer;
+}
+
 html {
   scroll-behavior: smooth;
 }

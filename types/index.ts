@@ -77,6 +77,29 @@ export interface ChatRequestBody {
   readonly reviews: readonly TrustpilotReview[]
 }
 
+export interface ReviewRecord {
+  readonly id: string
+  readonly reviewText: string
+  readonly rating?: number
+  readonly product?: string
+  readonly createdAt?: string
+}
+
+export type GuardedAnswer =
+  | { readonly status: 'ok'; readonly answer: string }
+  | { readonly status: 'refused'; readonly answer: string; readonly reason: string }
+
+export interface LlmGenerateInput {
+  readonly system: string
+  readonly user: string
+  readonly context: string
+  readonly temperature?: number
+}
+
+export interface LlmClient {
+  generate: (input: LlmGenerateInput) => Promise<string>
+}
+
 export interface ExportRequestBody {
   readonly brief: ReviewBrief
   readonly reviews: readonly TrustpilotReview[]
@@ -93,6 +116,8 @@ export interface BBriefPanelProps {
 export interface BMessageListProps {
   readonly messages: readonly UIMessage[]
   readonly isStreaming: boolean
+  readonly isCompact?: boolean
+  readonly tone?: 'default' | 'sidebar'
 }
 
 export interface BMessageInputProps {
@@ -100,6 +125,7 @@ export interface BMessageInputProps {
   readonly isDisabled: boolean
   readonly onChange: (value: string) => void
   readonly onSubmit: () => void
+  readonly isMinimal?: boolean
 }
 
 export interface BModeToggleProps {
@@ -118,4 +144,8 @@ export interface BExportButtonProps {
 export interface BIngestLoaderProps {
   readonly isVisible: boolean
   readonly hasReviews: boolean
+}
+
+export interface BChatPanelProps {
+  readonly isSidebar?: boolean
 }
