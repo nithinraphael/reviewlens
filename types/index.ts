@@ -8,6 +8,7 @@ export interface TrustpilotReview {
   readonly body: string
   readonly date: string
   readonly verified: boolean
+  readonly embedding?: readonly number[]
 }
 
 export interface ReviewBrief {

@@ -8,6 +8,7 @@ import { parseJson } from '@/lib/json'
 import { createRouteLogger } from '@/lib/logger'
 import { getUIMessageText } from '@/lib/messages'
 import { getSystemPrompt } from '@/lib/prompts'
+import { ensureReviewEmbeddings, retrieveTopKReviews } from '@/lib/rag'
 import type { ChatRequestBody, LlmClient } from '@/types'
 
 export const maxDuration = 30
@@ -89,14 +90,39 @@ export const POST = async (request: Request) => {
     return NextResponse.json({ error: getBlockedMessage(mode) }, { status: 400 })
   }
 
+  const embeddedReviews = await ensureReviewEmbeddings(reviews)
+  if (Flip.isErr(embeddedReviews)) {
+    const message = normalizeErrorMessage(Flip.e(embeddedReviews).message)
+    requestLogger.error(
+      { event: 'embedding_unavailable', error: message, durationMs: Date.now() - startedAt },
+      'Chat request failed while ensuring review embeddings',
+    )
+    return NextResponse.json({ error: message }, { status: 503 })
+  }
+
+  const retrievedReviews = await retrieveTopKReviews(latestUserText, Flip.v(embeddedReviews))
+  if (Flip.isErr(retrievedReviews)) {
+    const message = normalizeErrorMessage(Flip.e(retrievedReviews).message)
+    requestLogger.error(
+      { event: 'retrieval_failed', error: message, durationMs: Date.now() - startedAt },
+      'Chat request failed during vector retrieval',
+    )
+    return NextResponse.json({ error: message }, { status: 500 })
+  }
+
   const modelMessages = await convertToModelMessages(stripMessageIds(messages))
   requestLogger.info(
-    { event: 'chat_stream_started', model: kModel, durationMs: Date.now() - startedAt },
+    {
+      event: 'chat_stream_started',
+      model: kModel,
+      durationMs: Date.now() - startedAt,
+      retrievedReviewCount: Flip.v(retrievedReviews).length,
+    },
     'Starting Gemini chat stream',
   )
   const result = streamText({
     model: google(kModel),
-    system: getSystemPrompt(mode, reviews),
+    system: getSystemPrompt(mode, Flip.v(retrievedReviews)),
     messages: modelMessages,
     maxOutputTokens: 900,
   })

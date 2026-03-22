@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server'
 import { toFlipError } from '@/lib/flip'
 import { parseJson } from '@/lib/json'
 import { createRouteLogger } from '@/lib/logger'
+import { embedReviews } from '@/lib/rag'
 import {
   dedupeReviews,
   getMaxReviews,
@@ -102,7 +103,17 @@ export const POST = async (request: Request) => {
     return NextResponse.json({ error: message }, { status })
   }
 
-  const response: ReviewsResponseBody = { reviews: Flip.v(reviewsResult) }
+  const embeddedReviews = await embedReviews(Flip.v(reviewsResult))
+  if (Flip.isErr(embeddedReviews)) {
+    const message = Flip.e(embeddedReviews).message
+    requestLogger.error(
+      { event: 'embedding_failed', error: message, durationMs: Date.now() - startedAt },
+      'Review embedding failed',
+    )
+    return NextResponse.json({ error: message }, { status: 500 })
+  }
+
+  const response: ReviewsResponseBody = { reviews: Flip.v(embeddedReviews) }
   requestLogger.info(
     {
       event: 'request_completed',
