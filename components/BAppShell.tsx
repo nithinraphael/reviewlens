@@ -13,7 +13,7 @@ import { BUrlInput } from '@/components/BUrlInput'
 import { useReviewStore } from '@/store/reviewStore'
 import type { AnalystMode, TrustpilotReview } from '@/types'
 
-type SectionId = 'dashboard' | 'reviews' | 'briefing' | 'chat' | 'exports' | 'settings' | 'help'
+type SectionId = 'dashboard' | 'reviews' | 'briefing' | 'chat'
 
 interface SidebarItem {
   readonly id: SectionId
@@ -37,7 +37,6 @@ const kSidebarItems: readonly SidebarItem[] = [
   { id: 'reviews', label: 'Reviews' },
   { id: 'briefing', label: 'Briefing' },
   { id: 'chat', label: 'Chat' },
-  { id: 'exports', label: 'Exports' },
 ]
 
 const toDisplayRating = (rating: number) => `${rating.toFixed(1).replace(/\.0$/, '')}/5`
@@ -66,7 +65,6 @@ export const BAppShell: FC = () => {
   const mode = useReviewStore((state) => state.mode)
   const reviews = useReviewStore((state) => state.reviews)
   const isLoading = useReviewStore((state) => state.isLoading)
-  const reset = useReviewStore((state) => state.reset)
   const setMode = useReviewStore((state) => state.setMode)
 
   const contentRef = useRef<HTMLDivElement>(null)
@@ -74,9 +72,6 @@ export const BAppShell: FC = () => {
   const dashboardRef = useRef<HTMLElement>(null)
   const reviewsRef = useRef<HTMLElement>(null)
   const briefingRef = useRef<HTMLElement>(null)
-  const exportsRef = useRef<HTMLElement>(null)
-  const settingsRef = useRef<HTMLElement>(null)
-  const helpRef = useRef<HTMLElement>(null)
   const [activeSection, setActiveSection] = useState<SectionId>('dashboard')
   const [isChatOpen, setIsChatOpen] = useState(false)
   const [isTutorialOpen, setIsTutorialOpen] = useState(false)
@@ -89,9 +84,6 @@ export const BAppShell: FC = () => {
       { id: 'dashboard', element: dashboardRef.current },
       { id: 'reviews', element: reviewsRef.current },
       { id: 'briefing', element: briefingRef.current },
-      { id: 'exports', element: exportsRef.current },
-      { id: 'settings', element: settingsRef.current },
-      { id: 'help', element: helpRef.current },
     ]
     const visibleSections = sections.filter(
       (section): section is ObservedSection & { readonly element: HTMLElement } => section.element instanceof HTMLElement,
@@ -133,9 +125,6 @@ export const BAppShell: FC = () => {
       reviews: reviewsRef,
       briefing: briefingRef,
       chat: chatPanelRef,
-      exports: exportsRef,
-      settings: settingsRef,
-      help: helpRef,
     }
 
     refMap[sectionId].current?.scrollIntoView({
@@ -143,11 +132,6 @@ export const BAppShell: FC = () => {
       block: 'start',
     })
     setActiveSection(sectionId)
-  }
-
-  const handleResetWorkspace = () => {
-    reset()
-    scrollToSection('dashboard')
   }
 
   const handleToggleChat = () => {
@@ -246,7 +230,7 @@ export const BAppShell: FC = () => {
                 />
                 <motion.button
                   className="flex h-12 w-12 items-center justify-center rounded-full bg-[#e8f255] text-sm font-semibold shadow-[0_12px_24px_rgba(232,242,85,0.28)]"
-                  onClick={() => scrollToSection('settings')}
+                  onClick={() => scrollToSection('dashboard')}
                   type="button"
                   whileHover={{ y: -2, scale: 1.04 }}
                   whileTap={{ scale: 0.97 }}
@@ -367,80 +351,6 @@ export const BAppShell: FC = () => {
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </section>
-
-              <section ref={exportsRef}>
-                <motion.div
-                  {...kPanelMotion}
-                  className="relative overflow-hidden rounded-[34px] border border-black/10 bg-white p-6 shadow-[0_18px_50px_rgba(25,25,25,0.04)] lg:p-8"
-                >
-                  <div className="absolute left-0 right-0 top-0 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.15)_1px,_transparent_1.5px)] bg-[length:9px_1px] bg-repeat-x" />
-                  <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                    <div>
-                      <p className="text-sm uppercase tracking-[0.28em] text-black/35">Exports</p>
-                      <h2 className="mt-1 text-4xl font-semibold tracking-tight">Share the workspace</h2>
-                    </div>
-                    <BExportButton
-                      brief={brief}
-                      isDisabled={!brief}
-                      messages={chatMessages}
-                      mode={mode}
-                      reviews={reviews}
-                    />
-                  </div>
-                  <div className="mt-5 rounded-[24px] border border-black/8 bg-[#f8f6f1] p-5 text-[16px] leading-8 text-black/68">
-                    Export creates a PDF of the loaded dashboard, briefing, and conversation transcript. The button becomes active once a brief exists.
-                  </div>
-                </motion.div>
-              </section>
-
-              <section ref={settingsRef}>
-                <motion.div
-                  {...kPanelMotion}
-                  className="relative overflow-hidden rounded-[34px] border border-black/10 bg-white p-6 shadow-[0_18px_50px_rgba(25,25,25,0.04)] lg:p-8"
-                >
-                  <div className="absolute left-0 right-0 top-0 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.15)_1px,_transparent_1.5px)] bg-[length:9px_1px] bg-repeat-x" />
-                  <p className="text-sm uppercase tracking-[0.28em] text-black/35">Settings</p>
-                  <h2 className="mt-1 text-4xl font-semibold tracking-tight">Workspace controls</h2>
-                  <div className="mt-5 flex flex-wrap gap-3">
-                    <button
-                      className="rounded-[18px] border border-black bg-black px-4 py-3 text-sm font-medium text-white transition hover:bg-[#1f1f1f]"
-                      onClick={handleResetWorkspace}
-                      type="button"
-                    >
-                      Reset workspace
-                    </button>
-                    <button
-                      className="rounded-[18px] border border-black/10 bg-[#f5f3eb] px-4 py-3 text-sm font-medium text-black/70"
-                      onClick={() => scrollToSection('dashboard')}
-                      type="button"
-                    >
-                      Back to top
-                    </button>
-                  </div>
-                </motion.div>
-              </section>
-
-              <section ref={helpRef}>
-                <motion.div
-                  {...kPanelMotion}
-                  className="relative overflow-hidden rounded-[34px] border border-black/10 bg-white p-6 shadow-[0_18px_50px_rgba(25,25,25,0.04)] lg:p-8"
-                >
-                  <div className="absolute left-0 right-0 top-0 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.15)_1px,_transparent_1.5px)] bg-[length:9px_1px] bg-repeat-x" />
-                  <p className="text-sm uppercase tracking-[0.28em] text-black/35">Help &amp; Support</p>
-                  <h2 className="mt-1 text-4xl font-semibold tracking-tight">How to use the workspace</h2>
-                  <div className="mt-5 grid gap-3 lg:grid-cols-3">
-                    <div className="rounded-[22px] border border-black/8 bg-[#f8f6f1] p-4 text-[15px] leading-7 text-black/68">
-                      1. Paste a Trustpilot business review URL and run analysis.
-                    </div>
-                    <div className="rounded-[22px] border border-black/8 bg-[#f8f6f1] p-4 text-[15px] leading-7 text-black/68">
-                      2. Review the statistics, rating distribution, and generated brief.
-                    </div>
-                    <div className="rounded-[22px] border border-black/8 bg-[#f8f6f1] p-4 text-[15px] leading-7 text-black/68">
-                      3. Use chat prompts to ask follow-up questions and export the report when ready.
-                    </div>
-                  </div>
-                </motion.div>
               </section>
               </div>
             </div>
