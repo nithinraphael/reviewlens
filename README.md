@@ -46,14 +46,14 @@ interface TrustpilotReview {
 ```
 
 5. Duplicate reviews (matched on `author + date + body`) are removed.
-6. The result is capped at `MAX_REVIEWS` (default: `100`). Each additional page costs one Firecrawl credit.
+6. The result is capped at `MAX_REVIEWS` (default: `100`). (Max Pages: `3`)
 7. The normalised reviews are returned and saved to Zustand store + `localStorage`.
 
 ---
 
 ### Phase 2 — Brief (`/api/brief`)
 
-Immediately after ingestion, the reviews are sent to Gemini (`gemini-2.5-flash`) for analysis.
+Immediately after ingestion, the reviews are sent to Gemini  for analysis.
 
 The model is given a strict system prompt instructing it to return **only** valid JSON:
 
