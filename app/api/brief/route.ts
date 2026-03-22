@@ -11,7 +11,7 @@ import { createRouteLogger } from '@/lib/logger'
 import { buildBriefPrompt, kBriefSystemPrompt } from '@/lib/prompts'
 import type { BriefRequestBody, ReviewBrief } from '@/types'
 
-const kModel = 'gemini-2.5-flash'
+const kModel = 'gemini-3-flash-preview'
 
 const generateBrief = async (
   reviews: BriefRequestBody['reviews'],
@@ -26,11 +26,11 @@ const generateBrief = async (
   requestLogger.info({ event: 'brief_generation_started', reviewCount: reviews.length }, 'Generating AI brief')
 
   const message = await generateText({
-      model: google(kModel),
-      system: kBriefSystemPrompt,
-      prompt,
-      maxOutputTokens: 1000,
-    })
+    model: google(kModel),
+    system: kBriefSystemPrompt,
+    prompt,
+    maxOutputTokens: 1000,
+  })
     .then((result) => Flip.ok(result.text) as Flip.R<string, Error>)
     .catch((error: unknown) => toFlipError<string>(error, 'Brief generation failed'))
 
