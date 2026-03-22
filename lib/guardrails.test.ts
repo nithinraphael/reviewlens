@@ -38,18 +38,6 @@ describe('checkGuardrails', () => {
     expect(Flip.isErr(result)).toBe(true)
     expect(Flip.e(result)).toBe('blocked_phrase')
   })
-
-  it('blocks PII', () => {
-    const result = checkGuardrails('Contact me at analyst@example.com with the details.')
-    expect(Flip.isErr(result)).toBe(true)
-    expect(Flip.e(result)).toBe('pii_detected')
-  })
-
-  it('blocks ambiguous prompts', () => {
-    const result = checkGuardrails('Summarize')
-    expect(Flip.isErr(result)).toBe(true)
-    expect(Flip.e(result)).toBe('query_ambiguous')
-  })
 })
 
 describe('sanitizeContext', () => {

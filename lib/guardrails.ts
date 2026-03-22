@@ -5,7 +5,6 @@ const kMaxQueryChars = 500
 const kMaxReviews = 250
 const kMaxReviewChars = 1500
 const kScopeSampleReviews = 50
-const kAnswerMaxChars = 2500
 
 const kBlockedPhrases = [
   'ignore previous instructions',
@@ -21,29 +20,6 @@ const kBlockedPhrases = [
   'act as an unrestricted',
   'bypass safety',
   'bypass guardrails',
-] as const
-
-const kBlockedProfanity = ['fuck', 'shit', 'bitch', 'asshole'] as const
-
-const kPiiPatterns = [
-  /\b[\w.+-]+@[\w-]+\.[a-z]{2,}\b/i,
-  /\b\d{3}[-.]?\d{3}[-.]?\d{4}\b/,
-] as const
-
-const kVagueOnlyQueries = [
-  'what about it',
-  'is it good',
-  'tell me more',
-  'what do you think',
-  'summarize',
-] as const
-
-const kExternalKnowledgePatterns = [
-  /\baccording to (research|studies|wikipedia|news)\b/i,
-  /\bglobally\b/i,
-  /\bindustry standard\b/i,
-  /\bthe company\b/i,
-  /\bmarket share\b/i,
 ] as const
 
 const toGenerateResult = async (promise: Promise<string>) =>
@@ -62,27 +38,10 @@ const validateUserInput = (query: string): Flip.R<true, string> => {
     if (lowerQuery.includes(phrase)) return Flip.err('blocked_phrase')
   }
 
-  for (const phrase of kBlockedProfanity) {
-    if (lowerQuery.includes(phrase)) return Flip.err('profanity_detected')
-  }
-
-  for (const pattern of kPiiPatterns) {
-    if (pattern.test(trimmedQuery)) return Flip.err('pii_detected')
-  }
-
   return Flip.ok(true)
 }
 
-const isAmbiguousQuery = (query: string) => {
-  const normalizedQuery = query.trim().toLowerCase()
-  if (normalizedQuery.split(/\s+/).length < 4) return true
-  return (kVagueOnlyQueries as readonly string[]).includes(normalizedQuery)
-}
-
 const hasReviewCitation = (answer: string) => /\[review_id=[^\]]+\]/i.test(answer)
-
-const looksLikeExternalKnowledge = (answer: string) =>
-  kExternalKnowledgePatterns.some((pattern) => pattern.test(answer))
 
 const buildReviewRecord = ({ id, title, body, rating, date }: TrustpilotReview): ReviewRecord => ({
   id: String(id).trim(),
@@ -133,7 +92,6 @@ export const generateRefusalResponse = (): GuardedAnswer => ({
 export const checkGuardrails = (message: string): Flip.R<true, string> => {
   const inputCheck = validateUserInput(message)
   if (Flip.isErr(inputCheck)) return inputCheck
-  if (isAmbiguousQuery(message)) return Flip.err('query_ambiguous')
   return Flip.ok(true)
 }
 
@@ -144,7 +102,6 @@ export const isQueryInScope = async (
 ): Promise<Flip.R<true, string>> => {
   const inputCheck = validateUserInput(query)
   if (Flip.isErr(inputCheck)) return inputCheck
-  if (isAmbiguousQuery(query)) return Flip.err('query_ambiguous')
 
   const cleanDataset = sanitizeContext(dataset)
   if (cleanDataset.length === 0) return Flip.err('empty_context')
@@ -177,7 +134,7 @@ export const guardedQuery = async (
   llm: LlmClient,
 ): Promise<GuardedAnswer> => {
   const inputCheck = validateUserInput(query)
-  if (Flip.isErr(inputCheck) || isAmbiguousQuery(query)) return generateRefusalResponse()
+  if (Flip.isErr(inputCheck)) return generateRefusalResponse()
 
   const scopeResult = await isQueryInScope(query, dataset, llm)
   if (Flip.isErr(scopeResult)) return generateRefusalResponse()
@@ -203,11 +160,9 @@ export const guardedQuery = async (
 
   if (Flip.isErr(result)) return generateRefusalResponse()
 
-  const answer = String(Flip.v(result) ?? '').trim().slice(0, kAnswerMaxChars)
+  const answer = String(Flip.v(result) ?? '').trim()
   if (!answer) return generateRefusalResponse()
   if (!hasReviewCitation(answer)) return generateRefusalResponse()
-  if (looksLikeExternalKnowledge(answer) && !hasReviewCitation(answer)) return generateRefusalResponse()
-  if (/ignore (instructions|rules)|cannot comply with policy/i.test(answer)) return generateRefusalResponse()
 
   return { status: 'ok', answer }
 }

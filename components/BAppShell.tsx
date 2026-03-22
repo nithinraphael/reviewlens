@@ -7,12 +7,11 @@ import { BBriefPanel } from "@/components/BBriefPanel";
 import { BChatPanel } from "@/components/BChatPanel";
 import { BExportButton } from "@/components/BExportButton";
 import { BIngestLoader } from "@/components/BIngestLoader";
-import { BModeToggle } from "@/components/BModeToggle";
 import { BTutorialModal } from "@/components/BTutorialModal";
 import { BUrlInput } from "@/components/BUrlInput";
 import { useReviewIngest } from "@/hooks/useReviewIngest";
 import { useReviewStore } from "@/store/reviewStore";
-import type { AnalystMode, TrustpilotReview } from "@/types";
+import type { TrustpilotReview } from "@/types";
 
 type SectionId = "dashboard" | "reviews" | "briefing" | "chat";
 
@@ -353,7 +352,6 @@ const BIdleState: FC<{
 export const BAppShell: FC = () => {
   const brief = useReviewStore((state) => state.brief);
   const chatMessages = useReviewStore((state) => state.chatMessages);
-  const mode = useReviewStore((state) => state.mode);
   const reviews = useReviewStore((state) => state.reviews);
   const storedUrl = useReviewStore((state) => state.url);
   const isLoading = useReviewStore((state) => state.isLoading);
@@ -421,9 +419,9 @@ export const BAppShell: FC = () => {
     setNavbarUrl(storedUrl);
   }, [storedUrl]);
 
-  const handleModeChange = (nextMode: AnalystMode) => {
-    setMode(nextMode);
-  };
+  useEffect(() => {
+    setMode("analyst");
+  }, [setMode]);
 
   const scrollToSection = (sectionId: SectionId) => {
     if (sectionId === "chat") {
@@ -591,12 +589,11 @@ export const BAppShell: FC = () => {
                   <div />
                 )}
                 <div className="flex flex-wrap items-center gap-3">
-                  <BModeToggle mode={mode} onChange={handleModeChange} />
                   <BExportButton
                     brief={brief}
                     isDisabled={!brief}
                     messages={chatMessages}
-                    mode={mode}
+                    mode="analyst"
                     reviews={reviews}
                   />
                 </div>
@@ -630,7 +627,7 @@ export const BAppShell: FC = () => {
                         Mode
                       </div>
                       <div className="mt-2 text-xl font-semibold capitalize">
-                        {mode}
+                        analyst
                       </div>
                     </div>
                     <div className="relative overflow-hidden rounded-[24px] border border-black/8 bg-white px-4 py-3">
