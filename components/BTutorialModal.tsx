@@ -10,6 +10,13 @@ interface TutorialStep {
   readonly body: string
 }
 
+interface TutorialFlowLane {
+  readonly key: string
+  readonly title: string
+  readonly nodes: readonly string[]
+  readonly accentClassName: string
+}
+
 const kTutorialSteps: readonly TutorialStep[] = [
   {
     label: '01',
@@ -33,12 +40,19 @@ const kTutorialSteps: readonly TutorialStep[] = [
   },
 ] as const
 
-const kDiagramNodes = [
-  { key: 'source', step: 'Step 1', label: 'Trustpilot URL', nextStepLabel: 'Next: Step 2', accent: 'from-[#f4f2eb] to-white' },
-  { key: 'reviews', step: 'Step 2', label: 'Review dataset', nextStepLabel: 'Next: Step 3', accent: 'from-[#f7f5ef] to-white' },
-  { key: 'brief', step: 'Step 3', label: 'Auto brief', nextStepLabel: 'Next: Step 4', accent: 'from-[#f3f0ea] to-white' },
-  { key: 'pdf', step: 'Step 5', label: 'PDF export', nextStepLabel: 'Final', accent: 'from-[#fbfaf7] to-white' },
-  { key: 'chat', step: 'Step 4', label: 'Grounded chat', nextStepLabel: 'Next: Step 5', accent: 'from-[#f5f3ff] to-white' },
+const kFlowLanes: readonly TutorialFlowLane[] = [
+  {
+    key: 'ingest',
+    title: 'Ingest lane',
+    nodes: ['User', 'URL', 'Scraper', 'Store', 'Embed', 'VectorSearch'],
+    accentClassName: 'from-[#f4f2eb] to-white',
+  },
+  {
+    key: 'query',
+    title: 'Query lane',
+    nodes: ['User', 'Query', 'Guardrail1', 'VectorSearch', 'TopK', 'PromptGuardrail', 'Gemini', 'Response'],
+    accentClassName: 'from-[#f5f3ff] to-white',
+  },
 ] as const
 
 export const BTutorialModal: FC<BTutorialModalProps> = ({ isOpen, onClose }) => (
@@ -119,35 +133,48 @@ export const BTutorialModal: FC<BTutorialModalProps> = ({ isOpen, onClose }) => 
                 <div className="absolute inset-x-6 top-0 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.12)_1px,_transparent_1.5px)] bg-[length:9px_1px] bg-repeat-x opacity-85" />
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(168,120,255,0.09),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(232,242,85,0.12),transparent_28%)]" />
 
-                <div className="grid grid-cols-3 gap-3">
-                  {kDiagramNodes.map(({ key, step, label, nextStepLabel, accent }, index) => (
+                <div className="space-y-4">
+                  {kFlowLanes.map(({ key, title, nodes, accentClassName }, laneIndex) => (
                     <motion.div
-                      animate={{ opacity: [0.9, 1, 0.9], y: [0, -3, 0] }}
-                      className={`relative flex min-h-28 flex-col justify-between overflow-hidden rounded-[24px] border border-black/8 bg-gradient-to-b ${accent} px-4 py-4 shadow-[0_16px_36px_rgba(18,18,18,0.05)] ${index === 3 ? 'col-start-2' : index === 4 ? 'col-start-3' : ''
-                        }`}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`relative overflow-hidden rounded-[24px] border border-black/8 bg-gradient-to-b ${accentClassName} p-4 shadow-[0_14px_30px_rgba(18,18,18,0.05)]`}
+                      initial={{ opacity: 0, y: 14 }}
                       key={key}
-                      transition={{
-                        duration: 2.8,
-                        delay: index * 0.14,
-                        repeat: Number.POSITIVE_INFINITY,
-                        ease: 'easeInOut',
-                      }}
-                      whileHover={{ y: -2 }}
+                      transition={{ delay: laneIndex * 0.08, duration: 0.24, ease: 'easeOut' }}
                     >
                       <div className="absolute inset-x-4 top-0 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.11)_1px,_transparent_1.4px)] bg-[length:8px_1px] bg-repeat-x opacity-75" />
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <div className="text-[9px] uppercase tracking-[0.34em] text-black/28">Step</div>
-                          <div className="mt-1 text-[2.15rem] font-semibold leading-none tracking-[-0.08em] text-black/72">
-                            {step.replace('Step ', '')}
+                      <div className="text-[10px] uppercase tracking-[0.28em] text-black/34">{title}</div>
+                      <div className="mt-4 flex flex-wrap items-center gap-2.5">
+                        {nodes.map((node, index) => (
+                          <div className="contents" key={`${key}-${node}`}>
+                            <motion.div
+                              animate={{ opacity: [0.9, 1, 0.9], y: [0, -2, 0] }}
+                              className="rounded-[18px] border border-black/8 bg-white/88 px-3 py-2 text-[13px] font-medium tracking-tight text-black shadow-[0_8px_18px_rgba(18,18,18,0.04)]"
+                              transition={{
+                                duration: 2.2,
+                                delay: index * 0.08,
+                                repeat: Number.POSITIVE_INFINITY,
+                                ease: 'easeInOut',
+                              }}
+                            >
+                              {node}
+                            </motion.div>
+                            {index < nodes.length - 1 ? (
+                              <motion.div
+                                animate={{ opacity: [0.35, 1, 0.35], x: [0, 3, 0] }}
+                                className="text-sm text-black/38"
+                                transition={{
+                                  duration: 1.4,
+                                  delay: index * 0.06,
+                                  repeat: Number.POSITIVE_INFINITY,
+                                  ease: 'easeInOut',
+                                }}
+                              >
+                                →
+                              </motion.div>
+                            ) : null}
                           </div>
-                        </div>
-                        <div className="mt-3 h-[2px] w-24 bg-[linear-gradient(90deg,rgba(18,18,18,0.18),rgba(168,120,255,0.92),rgba(18,18,18,0.18))]" />
-                      </div>
-                      <div className="mt-2 text-[16px] font-medium leading-5 tracking-tight text-black">{label}</div>
-                      <div className="mt-4 flex items-center gap-2">
-                        <div className="h-2.5 w-2.5 rounded-full bg-[#e8f255]" />
-                        <div className="text-[11px] uppercase tracking-[0.22em] text-black/34">{nextStepLabel}</div>
+                        ))}
                       </div>
                     </motion.div>
                   ))}
