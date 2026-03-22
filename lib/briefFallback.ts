@@ -1,49 +1,25 @@
 import type { ReviewBrief, TrustpilotReview } from '@/types'
 
-const kStopWords = new Set([
-  'a',
-  'an',
-  'and',
-  'are',
-  'as',
-  'at',
-  'be',
-  'been',
-  'but',
-  'by',
-  'for',
-  'from',
-  'had',
-  'has',
-  'have',
-  'i',
-  'if',
-  'in',
-  'is',
-  'it',
-  'its',
-  'my',
-  'of',
-  'on',
-  'or',
-  'our',
-  'so',
-  'that',
-  'the',
-  'their',
-  'them',
-  'there',
-  'they',
-  'this',
-  'to',
-  'very',
-  'was',
-  'we',
-  'were',
-  'with',
-  'you',
-  'your',
-])
+interface ThemeBucket {
+  readonly label: string
+  readonly keywords: readonly string[]
+}
+
+const kPainThemeBuckets: readonly ThemeBucket[] = [
+  { label: 'Slow response times from support', keywords: ['slow response', 'no response', 'waiting', 'waited', 'delay'] },
+  { label: 'Inconsistent service quality across orders', keywords: ['inconsistent', 'different each time', 'hit or miss', 'not consistent'] },
+  { label: 'Refund and cancellation handling is difficult', keywords: ['refund', 'cancel', 'cancellation', 'money back', 'chargeback'] },
+  { label: 'Delivery arrived late or not as promised', keywords: ['late delivery', 'arrived late', 'did not arrive', 'delivery issue'] },
+  { label: 'Order outcome did not match expectations', keywords: ['not as described', 'different from', 'expectation', 'misleading'] },
+] as const
+
+const kPraiseThemeBuckets: readonly ThemeBucket[] = [
+  { label: 'Helpful and professional support team', keywords: ['helpful', 'supportive', 'friendly', 'professional', 'customer service'] },
+  { label: 'Fast and smooth ordering process', keywords: ['easy to order', 'smooth process', 'quick checkout', 'simple to use'] },
+  { label: 'Reliable and on-time delivery experience', keywords: ['on time', 'arrived on time', 'prompt delivery', 'quick delivery'] },
+  { label: 'High product quality and presentation', keywords: ['high quality', 'great quality', 'beautiful', 'fresh', 'well packaged'] },
+  { label: 'Good value for money', keywords: ['good value', 'worth the price', 'reasonable price', 'fair price'] },
+] as const
 
 const kUrgentKeywords = [
   'fraud',
@@ -63,39 +39,31 @@ const kUrgentKeywords = [
   'threat',
 ] as const
 
-const cleanToken = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, '')
-
 const toAverageRating = (reviews: readonly TrustpilotReview[]) => {
   if (reviews.length === 0) return 0
   const total = reviews.reduce((sum, { rating }) => sum + rating, 0)
   return Number((total / reviews.length).toFixed(1))
 }
 
-const countThemes = (reviews: readonly TrustpilotReview[]) => {
-  const counts = new Map<string, number>()
+const getReviewText = ({ title, body }: TrustpilotReview) => `${title} ${body}`.toLowerCase()
 
-  reviews.forEach(({ title, body }) => {
-    const tokens = `${title} ${body}`
-      .split(/\s+/)
-      .map(cleanToken)
-      .filter((token) => token.length >= 4 && !kStopWords.has(token))
+const countBucketMatches = (reviews: readonly TrustpilotReview[], buckets: readonly ThemeBucket[]) =>
+  buckets
+    .map(({ label, keywords }) => ({
+      label,
+      count: reviews.filter((review) => keywords.some((keyword) => getReviewText(review).includes(keyword))).length,
+    }))
+    .filter(({ count }) => count > 0)
+    .sort((left, right) => right.count - left.count)
+    .map(({ label }) => label)
 
-    tokens.forEach((token) => {
-      counts.set(token, (counts.get(token) ?? 0) + 1)
-    })
-  })
-
-  return [...counts.entries()]
-    .sort((left, right) => right[1] - left[1])
-    .map(([token]) => token)
-}
-
-const formatTheme = (value: string) => value.charAt(0).toUpperCase() + value.slice(1)
-
-const pickThemes = (reviews: readonly TrustpilotReview[], fallback: readonly string[]) => {
-  const ranked = countThemes(reviews)
-  const themes = ranked.slice(0, 5).map(formatTheme)
-  return themes.length > 0 ? themes : fallback
+const pickThemes = (
+  reviews: readonly TrustpilotReview[],
+  buckets: readonly ThemeBucket[],
+  fallback: readonly string[],
+) => {
+  const ranked = countBucketMatches(reviews, buckets).slice(0, 5)
+  return ranked.length > 0 ? ranked : fallback
 }
 
 const getUrgentFlags = (reviews: readonly TrustpilotReview[]) =>
@@ -128,10 +96,12 @@ export const buildFallbackBrief = (reviews: readonly TrustpilotReview[]): Review
   const averageRating = toAverageRating(reviews)
   const painPoints = pickThemes(
     reviews.filter(({ rating }) => rating <= 3),
+    kPainThemeBuckets,
     ['Slow response times', 'Service inconsistency', 'Expectation mismatch'],
   )
   const praiseThemes = pickThemes(
     reviews.filter(({ rating }) => rating >= 4),
+    kPraiseThemeBuckets,
     ['Helpful staff', 'Smooth experience', 'Strong product quality'],
   )
   const urgentFlags = getUrgentFlags(reviews)
