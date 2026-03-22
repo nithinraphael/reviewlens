@@ -352,7 +352,6 @@ const BIdleState: FC<{
 export const BAppShell: FC = () => {
   const brief = useReviewStore((state) => state.brief);
   const chatMessages = useReviewStore((state) => state.chatMessages);
-  const mode = useReviewStore((state) => state.mode);
   const reviews = useReviewStore((state) => state.reviews);
   const storedUrl = useReviewStore((state) => state.url);
   const isLoading = useReviewStore((state) => state.isLoading);
@@ -491,14 +490,14 @@ export const BAppShell: FC = () => {
             <nav className="space-y-1.5">
               {kSidebarItems.map(({ id, label }, index) => {
                 const isActive =
-                  activeSection === id || (id === 'chat' && isChatOpen);
+                  activeSection === id || (id === "chat" && isChatOpen);
 
                 return (
                   <motion.button
                     className={`group relative flex w-full items-center justify-between rounded-[22px] border px-4 py-3.5 text-left text-[15px] font-medium transition ${
                       isActive
-                        ? 'border-black/[0.09] bg-[linear-gradient(135deg,#f4f2ec_0%,#ece9e0_100%)] text-black shadow-[0_4px_14px_rgba(18,18,18,0.06)]'
-                        : 'border-transparent text-black/52 hover:border-black/[0.07] hover:bg-[#faf8f5] hover:text-black/80'
+                        ? "border-black/[0.09] bg-[linear-gradient(135deg,#f4f2ec_0%,#ece9e0_100%)] text-black shadow-[0_4px_14px_rgba(18,18,18,0.06)]"
+                        : "border-transparent text-black/52 hover:border-black/[0.07] hover:bg-[#faf8f5] hover:text-black/80"
                     }`}
                     key={id}
                     onClick={() => scrollToSection(id)}
@@ -507,8 +506,10 @@ export const BAppShell: FC = () => {
                     whileTap={{ scale: 0.98 }}
                   >
                     <div className="flex items-center gap-3.5">
-                      <span className={`font-mono text-[10px] tracking-[0.24em] ${isActive ? 'text-black/45' : 'text-black/28'}`}>
-                        {String(index + 1).padStart(2, '0')}
+                      <span
+                        className={`font-mono text-[10px] tracking-[0.24em] ${isActive ? "text-black/45" : "text-black/28"}`}
+                      >
+                        {String(index + 1).padStart(2, "0")}
                       </span>
                       <span>{label}</span>
                     </div>
@@ -516,7 +517,11 @@ export const BAppShell: FC = () => {
                       <motion.span
                         animate={{ scale: [1, 1.2, 1] }}
                         className="h-2 w-2 rounded-full bg-[#d6e040]"
-                        transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
+                        transition={{
+                          duration: 2,
+                          repeat: Number.POSITIVE_INFINITY,
+                          ease: "easeInOut",
+                        }}
                       />
                     ) : null}
                   </motion.button>
@@ -614,7 +619,7 @@ export const BAppShell: FC = () => {
               ref={contentRef}
             >
               <section className="mb-10" ref={dashboardRef}>
-                <div className="mb-7 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+                <div className="mb-7">
                   <div>
                     <p className="text-sm uppercase tracking-[0.28em] text-black/35">
                       Insights
@@ -623,27 +628,6 @@ export const BAppShell: FC = () => {
                       Reporting
                     </h1>
                     <div className="mt-4 h-px w-52 bg-[radial-gradient(circle,_rgba(18,18,18,0.18)_1px,_transparent_1.5px)] bg-[length:10px_1px] bg-repeat-x" />
-                  </div>
-                  <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-                    {[
-                      { label: 'Mode', value: mode, accent: false },
-                      { label: 'Reviews', value: String(reviews.length), accent: false },
-                      { label: 'Status', value: brief ? 'Ready' : 'Waiting', accent: false },
-                      { label: 'Workspace', value: 'Live', accent: true },
-                    ].map(({ label, value, accent }) => (
-                      <div
-                        className={`relative overflow-hidden rounded-[20px] border px-4 py-3 shadow-[0_2px_8px_rgba(18,18,18,0.04)] ${
-                          accent
-                            ? 'border-[#ccd640] bg-[linear-gradient(135deg,#eef257_0%,#e2e84a_100%)]'
-                            : 'border-black/[0.07] bg-white'
-                        }`}
-                        key={label}
-                      >
-                        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.55),transparent_55%)]" />
-                        <div className="relative text-[10px] font-medium uppercase tracking-[0.26em] text-black/38">{label}</div>
-                        <div className="relative mt-1.5 text-[18px] font-semibold capitalize tracking-tight text-black">{value}</div>
-                      </div>
-                    ))}
                   </div>
                 </div>
               </section>
@@ -679,7 +663,7 @@ export const BAppShell: FC = () => {
                         {reviews.slice(0, 10).map((review, index) => (
                           <div
                             className={`grid grid-cols-[1fr_100px_130px_110px] border-t border-black/[0.06] px-5 py-3.5 text-[14px] transition-colors ${
-                              index % 2 === 0 ? 'bg-white' : 'bg-[#fcfbf9]'
+                              index % 2 === 0 ? "bg-white" : "bg-[#fcfbf9]"
                             } hover:bg-[#f5f3ee]`}
                             key={review.id}
                           >
@@ -700,11 +684,11 @@ export const BAppShell: FC = () => {
                             <div>
                               <span
                                 className={`inline-block rounded-full px-3 py-1 text-[12px] font-medium ${
-                                  getStatusLabel(review) === 'Positive'
-                                    ? 'bg-[#e8f5d4] text-[#3d6b1a]'
-                                    : getStatusLabel(review) === 'Risk'
-                                      ? 'bg-[#fde8e2] text-[#8b3c27]'
-                                      : 'bg-[#f3f0ea] text-black/55'
+                                  getStatusLabel(review) === "Positive"
+                                    ? "bg-[#e8f5d4] text-[#3d6b1a]"
+                                    : getStatusLabel(review) === "Risk"
+                                      ? "bg-[#fde8e2] text-[#8b3c27]"
+                                      : "bg-[#f3f0ea] text-black/55"
                                 }`}
                               >
                                 {getStatusLabel(review)}
