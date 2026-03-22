@@ -620,16 +620,7 @@ export const BAppShell: FC = () => {
                     </h1>
                     <div className="mt-4 h-px w-52 bg-[radial-gradient(circle,_rgba(18,18,18,0.18)_1px,_transparent_1.5px)] bg-[length:10px_1px] bg-repeat-x" />
                   </div>
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                    <div className="relative overflow-hidden rounded-[24px] border border-black/8 bg-white px-4 py-3">
-                      <div className="absolute inset-x-4 top-3 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.13)_1px,_transparent_1.4px)] bg-[length:8px_1px] bg-repeat-x" />
-                      <div className="text-xs uppercase tracking-[0.2em] text-black/38">
-                        Mode
-                      </div>
-                      <div className="mt-2 text-xl font-semibold capitalize">
-                        analyst
-                      </div>
-                    </div>
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-1">
                     <div className="relative overflow-hidden rounded-[24px] border border-black/8 bg-white px-4 py-3">
                       <div className="absolute inset-x-4 top-3 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.13)_1px,_transparent_1.4px)] bg-[length:8px_1px] bg-repeat-x" />
                       <div className="text-xs uppercase tracking-[0.2em] text-black/38">
@@ -638,22 +629,6 @@ export const BAppShell: FC = () => {
                       <div className="mt-2 text-xl font-semibold">
                         {reviews.length}
                       </div>
-                    </div>
-                    <div className="relative overflow-hidden rounded-[24px] border border-black/8 bg-white px-4 py-3">
-                      <div className="absolute inset-x-4 top-3 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.13)_1px,_transparent_1.4px)] bg-[length:8px_1px] bg-repeat-x" />
-                      <div className="text-xs uppercase tracking-[0.2em] text-black/38">
-                        Status
-                      </div>
-                      <div className="mt-2 text-xl font-semibold">
-                        {brief ? "Ready" : "Waiting"}
-                      </div>
-                    </div>
-                    <div className="relative overflow-hidden rounded-[24px] border border-black/8 bg-[#f3f0ea] px-4 py-3">
-                      <div className="absolute inset-x-4 top-3 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.13)_1px,_transparent_1.4px)] bg-[length:8px_1px] bg-repeat-x" />
-                      <div className="text-xs uppercase tracking-[0.2em] text-black/38">
-                        Workspace
-                      </div>
-                      <div className="mt-2 text-xl font-semibold">Live</div>
                     </div>
                   </div>
                 </div>
