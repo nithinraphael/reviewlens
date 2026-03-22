@@ -352,6 +352,7 @@ const BIdleState: FC<{
 export const BAppShell: FC = () => {
   const brief = useReviewStore((state) => state.brief);
   const chatMessages = useReviewStore((state) => state.chatMessages);
+  const mode = useReviewStore((state) => state.mode);
   const reviews = useReviewStore((state) => state.reviews);
   const storedUrl = useReviewStore((state) => state.url);
   const isLoading = useReviewStore((state) => state.isLoading);
@@ -487,33 +488,36 @@ export const BAppShell: FC = () => {
             </div>
           </div>
           <div className="flex min-h-0 flex-1 flex-col justify-between px-4 py-5">
-            <nav className="space-y-2">
+            <nav className="space-y-1.5">
               {kSidebarItems.map(({ id, label }, index) => {
                 const isActive =
-                  activeSection === id || (id === "chat" && isChatOpen);
+                  activeSection === id || (id === 'chat' && isChatOpen);
 
                 return (
                   <motion.button
-                    className={`group relative flex w-full items-center justify-between rounded-[28px] border px-5 py-4 text-left text-[17px] shadow-[0_8px_20px_rgba(18,18,18,0.02)] transition ${
+                    className={`group relative flex w-full items-center justify-between rounded-[22px] border px-4 py-3.5 text-left text-[15px] font-medium transition ${
                       isActive
-                        ? "border-black/12 bg-[#f3f0ea] font-medium text-black"
-                        : "border-transparent text-black/68 hover:border-black/8 hover:bg-[#faf8f3]"
+                        ? 'border-black/[0.09] bg-[linear-gradient(135deg,#f4f2ec_0%,#ece9e0_100%)] text-black shadow-[0_4px_14px_rgba(18,18,18,0.06)]'
+                        : 'border-transparent text-black/52 hover:border-black/[0.07] hover:bg-[#faf8f5] hover:text-black/80'
                     }`}
                     key={id}
                     onClick={() => scrollToSection(id)}
                     type="button"
-                    whileHover={{ x: 4, y: -1 }}
-                    whileTap={{ scale: 0.985 }}
+                    whileHover={{ x: 3 }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    <div className="flex items-center gap-4">
-                      <span className="font-mono text-[11px] tracking-[0.22em] text-black/35">
-                        {String(index + 1).padStart(2, "0")}
+                    <div className="flex items-center gap-3.5">
+                      <span className={`font-mono text-[10px] tracking-[0.24em] ${isActive ? 'text-black/45' : 'text-black/28'}`}>
+                        {String(index + 1).padStart(2, '0')}
                       </span>
                       <span>{label}</span>
                     </div>
-                    <span className="absolute inset-x-4 top-0 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.12)_1px,_transparent_1.4px)] bg-[length:8px_1px] bg-repeat-x opacity-70" />
                     {isActive ? (
-                      <span className="h-2.5 w-2.5 bg-[#e8f255]" />
+                      <motion.span
+                        animate={{ scale: [1, 1.2, 1] }}
+                        className="h-2 w-2 rounded-full bg-[#d6e040]"
+                        transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
+                      />
                     ) : null}
                   </motion.button>
                 );
@@ -620,16 +624,26 @@ export const BAppShell: FC = () => {
                     </h1>
                     <div className="mt-4 h-px w-52 bg-[radial-gradient(circle,_rgba(18,18,18,0.18)_1px,_transparent_1.5px)] bg-[length:10px_1px] bg-repeat-x" />
                   </div>
-                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-1">
-                    <div className="relative overflow-hidden rounded-[24px] border border-black/8 bg-white px-4 py-3">
-                      <div className="absolute inset-x-4 top-3 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.13)_1px,_transparent_1.4px)] bg-[length:8px_1px] bg-repeat-x" />
-                      <div className="text-xs uppercase tracking-[0.2em] text-black/38">
-                        Reviews
+                  <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+                    {[
+                      { label: 'Mode', value: mode, accent: false },
+                      { label: 'Reviews', value: String(reviews.length), accent: false },
+                      { label: 'Status', value: brief ? 'Ready' : 'Waiting', accent: false },
+                      { label: 'Workspace', value: 'Live', accent: true },
+                    ].map(({ label, value, accent }) => (
+                      <div
+                        className={`relative overflow-hidden rounded-[20px] border px-4 py-3 shadow-[0_2px_8px_rgba(18,18,18,0.04)] ${
+                          accent
+                            ? 'border-[#ccd640] bg-[linear-gradient(135deg,#eef257_0%,#e2e84a_100%)]'
+                            : 'border-black/[0.07] bg-white'
+                        }`}
+                        key={label}
+                      >
+                        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.55),transparent_55%)]" />
+                        <div className="relative text-[10px] font-medium uppercase tracking-[0.26em] text-black/38">{label}</div>
+                        <div className="relative mt-1.5 text-[18px] font-semibold capitalize tracking-tight text-black">{value}</div>
                       </div>
-                      <div className="mt-2 text-xl font-semibold">
-                        {reviews.length}
-                      </div>
-                    </div>
+                    ))}
                   </div>
                 </div>
               </section>
@@ -655,41 +669,42 @@ export const BAppShell: FC = () => {
                           {reviews.length}
                         </div>
                       </div>
-                      <div className="overflow-hidden rounded-[26px] border border-black/8">
-                        <div className="grid grid-cols-[1fr_120px_140px_120px] border-b border-black/8 bg-[#f8f6f1] px-5 py-3 text-sm uppercase tracking-[0.2em] text-black/42">
+                      <div className="overflow-hidden rounded-[22px] border border-black/[0.07]">
+                        <div className="grid grid-cols-[1fr_100px_130px_110px] border-b border-black/[0.07] bg-[#f8f6f1] px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.22em] text-black/38">
                           <div>Review</div>
                           <div>Rating</div>
                           <div>Date</div>
                           <div>Status</div>
                         </div>
-                        {reviews.slice(0, 10).map((review) => (
+                        {reviews.slice(0, 10).map((review, index) => (
                           <div
-                            className="relative grid grid-cols-[1fr_120px_140px_120px] border-t border-black/8 px-5 py-4 text-[15px]"
+                            className={`grid grid-cols-[1fr_100px_130px_110px] border-t border-black/[0.06] px-5 py-3.5 text-[14px] transition-colors ${
+                              index % 2 === 0 ? 'bg-white' : 'bg-[#fcfbf9]'
+                            } hover:bg-[#f5f3ee]`}
                             key={review.id}
                           >
-                            <div className="absolute inset-x-5 top-0 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.11)_1px,_transparent_1.5px)] bg-[length:8px_1px] bg-repeat-x opacity-80" />
                             <div>
                               <div className="font-medium text-black">
                                 {review.author}
                               </div>
-                              <div className="mt-1 text-black/62">
+                              <div className="mt-0.5 text-[13px] text-black/50">
                                 {getPreviewText(review)}
                               </div>
                             </div>
-                            <div className="font-medium text-black">
+                            <div className="font-semibold text-black">
                               {toDisplayRating(review.rating)}
                             </div>
-                            <div className="text-black/62">
+                            <div className="text-[13px] text-black/50">
                               {formatDate(review.date)}
                             </div>
                             <div>
                               <span
-                                className={`rounded-full px-3 py-1 text-sm ${
-                                  getStatusLabel(review) === "Positive"
-                                    ? "bg-[#eef5d2] text-[#48621b]"
-                                    : getStatusLabel(review) === "Risk"
-                                      ? "bg-[#f7e6df] text-[#8f4b33]"
-                                      : "bg-[#f3f0ea] text-black/62"
+                                className={`inline-block rounded-full px-3 py-1 text-[12px] font-medium ${
+                                  getStatusLabel(review) === 'Positive'
+                                    ? 'bg-[#e8f5d4] text-[#3d6b1a]'
+                                    : getStatusLabel(review) === 'Risk'
+                                      ? 'bg-[#fde8e2] text-[#8b3c27]'
+                                      : 'bg-[#f3f0ea] text-black/55'
                                 }`}
                               >
                                 {getStatusLabel(review)}

@@ -93,8 +93,8 @@ const getChartData = (tab: ChartTab, reviews: readonly TrustpilotReview[]): read
 }
 
 const getBarHeight = (value: number, maxValue: number) => {
-  if (maxValue === 0) return 18
-  return Math.max(18, Math.round((value / maxValue) * 100))
+  if (maxValue === 0) return 6
+  return Math.max(6, Math.round((value / maxValue) * 100))
 }
 
 const getInsightLine = (tab: ChartTab, data: readonly ChartDatum[]) => {
@@ -121,18 +121,16 @@ export const BBriefPanel: FC<BBriefPanelProps> = ({ brief, reviews, onSeeAllRevi
 
   return (
     <section className="space-y-5">
-      <motion.div
-        className="relative overflow-hidden rounded-[38px] border border-black/10 bg-white p-6 shadow-[0_18px_50px_rgba(25,25,25,0.04)] lg:p-8"
-        transition={{ duration: 0.28, ease: 'easeOut' }}
-        whileHover={{ y: -2 }}
-      >
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.82),transparent_42%)] opacity-70" />
-        <div className="absolute left-0 right-0 top-0 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.15)_1px,_transparent_1.5px)] bg-[length:9px_1px] bg-repeat-x" />
-        <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
+      {/* ── Overview card ── */}
+      <div className="relative overflow-hidden rounded-[38px] border border-black/[0.07] bg-white p-6 shadow-[0_2px_1px_rgba(0,0,0,0.03),0_8px_24px_rgba(0,0,0,0.05)] lg:p-8">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(255,255,255,0.9),transparent_55%)]" />
+        <div className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(18,18,18,0.10)_30%,rgba(18,18,18,0.10)_70%,transparent)]" />
+
+        <div className="relative flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
           <div>
-            <p className="text-sm uppercase tracking-[0.28em] text-black/35">Overview</p>
-            <h2 className="mt-2 text-4xl font-semibold tracking-tight text-black">Review performance</h2>
-            <div className="mt-4 h-px w-44 bg-[radial-gradient(circle,_rgba(18,18,18,0.18)_1px,_transparent_1.5px)] bg-[length:10px_1px] bg-repeat-x" />
+            <p className="text-[11px] font-medium uppercase tracking-[0.32em] text-black/35">Overview</p>
+            <h2 className="mt-2 text-[2.4rem] font-semibold tracking-[-0.04em] leading-[1] text-black">Review performance</h2>
+            <div className="mt-3.5 h-px w-40 bg-[linear-gradient(90deg,rgba(18,18,18,0.15),transparent)]" />
           </div>
           <div className="flex flex-wrap gap-3">
             <BStatPulse label="Average rating" tone="accent" value={brief.averageRating} />
@@ -141,192 +139,175 @@ export const BBriefPanel: FC<BBriefPanelProps> = ({ brief, reviews, onSeeAllRevi
           </div>
         </div>
 
-        <div className="mt-8 grid gap-7 xl:grid-cols-[1.2fr_0.8fr]">
-          <motion.div
-            className="relative overflow-hidden rounded-[32px] border border-black/8 p-5 shadow-[0_10px_28px_rgba(18,18,18,0.04)]"
-            transition={{ duration: 0.24, ease: 'easeOut' }}
-            whileHover={{ y: -2 }}
-          >
-            <div className="absolute inset-y-5 left-5 w-px bg-[radial-gradient(circle,_rgba(18,18,18,0.12)_1px,_transparent_1.5px)] bg-[length:1px_10px] bg-repeat-y opacity-75" />
-            <div className="mb-5 flex items-center justify-between gap-3">
-              <div>
-                <div className="text-sm uppercase tracking-[0.24em] text-black/42">Sentiment breakdown</div>
-                <div className="mt-1 text-[18px] font-medium text-black">
-                  Based on the currently loaded review dataset
-                </div>
-              </div>
-              <motion.div className="rounded-[20px] border border-black/8 bg-[#f5f3eb] px-4 py-2 text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]" whileHover={{ y: -1 }}>
-                Top bucket: {topBucket.label} ({topBucket.value})
-              </motion.div>
+        <div className="relative mt-8 grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
+          {/* Chart */}
+          <div className="overflow-hidden rounded-[28px] border border-black/[0.07] bg-[#fafaf8] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]">
+            {/* Tab row */}
+            <div className="mb-5 flex flex-wrap gap-1 rounded-[18px] border border-black/[0.07] bg-white/70 p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]">
+              {kChartTabs.map(({ id, label }) => (
+                <motion.button
+                  className={`relative flex-1 rounded-[14px] px-3 py-1.5 text-[13px] font-medium transition-colors ${
+                    id === activeTab
+                      ? 'bg-[#121212] text-white shadow-[0_4px_12px_rgba(18,18,18,0.20)]'
+                      : 'text-black/50 hover:text-black/75'
+                  }`}
+                  key={id}
+                  onClick={() => setActiveTab(id)}
+                  type="button"
+                  whileTap={{ scale: 0.97 }}
+                >
+                  {label}
+                </motion.button>
+              ))}
             </div>
 
-            <div className="rounded-[32px] border border-black/8 bg-[linear-gradient(180deg,#fbfaf7,#f7f5ef)] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]">
-              <div className="mb-5 flex flex-wrap gap-5 text-sm text-black/55">
-                {kChartTabs.map(({ id, label }) => (
-                  <motion.button
-                    className={`rounded-full border-b pb-1 transition ${
-                      id === activeTab ? 'border-black text-black' : 'border-transparent text-black/55 hover:border-black/20'
-                    }`}
-                    key={id}
-                    onClick={() => setActiveTab(id)}
-                    type="button"
-                    whileHover={{ y: -1 }}
-                    whileTap={{ scale: 0.985 }}
+            {/* Top bucket badge */}
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <p className="text-[13px] text-black/45">Sentiment breakdown — {activeTab}</p>
+              <span className="rounded-full border border-black/8 bg-white px-3 py-1 text-[12px] font-medium text-black/60 shadow-[0_2px_8px_rgba(18,18,18,0.06)]">
+                Top: {topBucket.label} ({topBucket.value})
+              </span>
+            </div>
+
+            {/* Bars */}
+            <div className={`grid h-[220px] items-end gap-3 ${chartData.length <= 2 ? 'grid-cols-2' : 'grid-cols-5'}`}>
+              {chartData.map(({ label, value }, index) => (
+                <div className="flex h-full flex-col items-center justify-end gap-2" key={label}>
+                  <span className="font-mono text-[12px] font-medium text-black/50">{value}</span>
+                  <motion.div
+                    animate={{ height: `${getBarHeight(value, maxValue)}%`, opacity: 1 }}
+                    className="relative w-full overflow-hidden rounded-t-[16px] bg-[linear-gradient(180deg,#e6f35c_0%,#ccd642_100%)] shadow-[0_8px_20px_rgba(214,225,79,0.30)]"
+                    initial={{ height: '6%', opacity: 0 }}
+                    transition={{ delay: index * 0.045, duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
+                    whileHover={{ scaleX: 1.05 }}
                   >
-                    {label}
-                  </motion.button>
-                ))}
-              </div>
-              <div className="relative overflow-hidden rounded-[24px] border border-black/8 bg-white/80 px-4 pb-4 pt-6">
-                <div className="pointer-events-none absolute inset-x-4 inset-y-6 grid grid-rows-4">
-                  {[0, 1, 2, 3].map((item) => (
-                    <div
-                      className="border-t border-black/8 bg-[radial-gradient(circle,_rgba(18,18,18,0.11)_1px,_transparent_1.4px)] bg-[length:9px_1px] bg-repeat-x"
-                      key={item}
-                    />
-                  ))}
+                    <div className="absolute inset-x-0 top-0 h-[40%] bg-[linear-gradient(180deg,rgba(255,255,255,0.22),transparent)]" />
+                  </motion.div>
+                  <span className="text-center text-[11px] text-black/45">{label}</span>
                 </div>
-                <div className={`relative grid h-[280px] items-end gap-3 ${chartData.length <= 2 ? 'grid-cols-2' : 'grid-cols-5'}`}>
-                  {chartData.map(({ label, value }, index) => (
-                    <div className="flex h-full flex-col justify-end" key={label}>
-                      <div className="mb-3 text-center font-mono text-sm text-black/48">{value}</div>
-                      <motion.div
-                        animate={{ height: `${getBarHeight(value, maxValue)}%`, opacity: 1 }}
-                        className="relative rounded-t-[22px] border border-[#d8e24f] bg-[linear-gradient(180deg,#e6f35c_0%,#d6e14f_70%,rgba(214,225,79,0.18)_100%)] shadow-[0_14px_24px_rgba(214,225,79,0.18)]"
-                        initial={{ height: '18%', opacity: 0.45 }}
-                        transition={{ delay: index * 0.04, duration: 0.45 }}
-                        whileHover={{ scaleX: 1.04 }}
-                      >
-                        <div className="absolute inset-x-2 top-2 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.2)_1px,_transparent_1.5px)] bg-[length:8px_1px] bg-repeat-x opacity-55" />
-                      </motion.div>
-                      <div className="mt-3 text-center text-sm text-black/55">{label}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="mt-4 rounded-[20px] border border-black/8 bg-white px-4 py-3 text-[15px] text-black/62">
-                {getInsightLine(activeTab, chartData)}
-              </div>
+              ))}
             </div>
-          </motion.div>
 
-          <motion.div
-            className="relative overflow-hidden rounded-[32px] border border-black/8 p-5 shadow-[0_10px_28px_rgba(18,18,18,0.04)]"
-            transition={{ duration: 0.24, ease: 'easeOut' }}
-            whileHover={{ y: -2 }}
-          >
-            <div className="absolute left-0 right-0 top-0 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.12)_1px,_transparent_1.5px)] bg-[length:9px_1px] bg-repeat-x" />
-            <div className="text-sm uppercase tracking-[0.24em] text-black/42">Executive summary</div>
-            <p className="mt-4 text-[17px] leading-8 text-black/72">{brief.summary}</p>
-            <div className="mt-6 space-y-3">
-              <motion.div className="rounded-[24px] border border-black/8 bg-[#f5f3eb] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]" whileHover={{ y: -1 }}>
-                <div className="text-xs uppercase tracking-[0.24em] text-black/38">Pain points</div>
-                <div className="mt-3 text-[16px] leading-7 text-black/72">
-                  {topPainPoints.join(' · ')}
-                </div>
-              </motion.div>
-              <motion.div className="rounded-[24px] border border-black/8 bg-[#f5f3eb] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]" whileHover={{ y: -1 }}>
-                <div className="text-xs uppercase tracking-[0.24em] text-black/38">Praise themes</div>
-                <div className="mt-3 text-[16px] leading-7 text-black/72">
-                  {topPraiseThemes.join(' · ')}
-                </div>
-              </motion.div>
+            {/* Insight line */}
+            <div className="mt-4 rounded-[18px] border border-black/[0.07] bg-white px-4 py-3 text-[14px] leading-6 text-black/55 shadow-[0_2px_8px_rgba(18,18,18,0.04)]">
+              {getInsightLine(activeTab, chartData)}
             </div>
-          </motion.div>
-        </div>
-      </motion.div>
-
-      <div className="grid gap-5 xl:grid-cols-[1.2fr_0.8fr]">
-        <motion.div
-          className="relative overflow-hidden rounded-[38px] border border-black/10 bg-white p-6 shadow-[0_18px_50px_rgba(25,25,25,0.04)]"
-          transition={{ duration: 0.24, ease: 'easeOut' }}
-          whileHover={{ y: -2 }}
-        >
-          <div className="absolute left-0 right-0 top-0 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.15)_1px,_transparent_1.5px)] bg-[length:9px_1px] bg-repeat-x" />
-          <div className="flex items-center justify-between gap-3">
-            <div className="text-3xl font-semibold tracking-tight">Theme table</div>
-            <motion.div className="rounded-full bg-[#e8f255] px-3 py-1 text-sm shadow-[0_8px_18px_rgba(232,242,85,0.28)]" whileHover={{ scale: 1.04 }}>
-              {brief.reviewCount}
-            </motion.div>
           </div>
-          <div className="mt-5 overflow-hidden rounded-[24px] border border-black/8">
-            <div className="grid grid-cols-[1.1fr_1.2fr_0.6fr] border-b border-black/8 bg-[#f8f6f1] px-5 py-3 text-sm uppercase tracking-[0.2em] text-black/42">
+
+          {/* Executive summary + pain/praise */}
+          <div className="flex flex-col gap-4">
+            <div className="flex-1 overflow-hidden rounded-[28px] border border-black/[0.07] bg-[#fafaf8] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]">
+              <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-black/35">Executive summary</p>
+              <p className="mt-3 text-[15px] leading-[1.75] text-black/68">{brief.summary}</p>
+            </div>
+            <div className="overflow-hidden rounded-[28px] border border-black/[0.07] bg-[#fafaf8] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]">
+              <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-black/35">Pain points</p>
+              <p className="mt-3 text-[14px] leading-[1.7] text-black/62">{topPainPoints.join(' · ')}</p>
+            </div>
+            <div className="overflow-hidden rounded-[28px] border border-black/[0.07] bg-[#fafaf8] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]">
+              <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-black/35">Praise themes</p>
+              <p className="mt-3 text-[14px] leading-[1.7] text-black/62">{topPraiseThemes.join(' · ')}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Theme table + Risk summary ── */}
+      <div className="grid gap-5 xl:grid-cols-[1.25fr_0.75fr]">
+        {/* Theme table */}
+        <div className="relative overflow-hidden rounded-[38px] border border-black/[0.07] bg-white p-6 shadow-[0_2px_1px_rgba(0,0,0,0.03),0_8px_24px_rgba(0,0,0,0.05)]">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(255,255,255,0.9),transparent_55%)]" />
+          <div className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(18,18,18,0.10)_30%,rgba(18,18,18,0.10)_70%,transparent)]" />
+          <div className="relative flex items-center justify-between gap-3">
+            <h3 className="text-[1.6rem] font-semibold tracking-tight text-black">Theme table</h3>
+            <span className="rounded-full bg-[#e8f255] px-3.5 py-1 text-[13px] font-semibold shadow-[0_4px_14px_rgba(232,242,85,0.32)]">
+              {brief.reviewCount}
+            </span>
+          </div>
+          <div className="relative mt-5 overflow-hidden rounded-[22px] border border-black/[0.07]">
+            <div className="grid grid-cols-[1.1fr_1.2fr_0.55fr] border-b border-black/[0.07] bg-[#f8f6f1] px-5 py-3 text-[11px] font-medium uppercase tracking-[0.22em] text-black/40">
               <div>Theme</div>
               <div>Observation</div>
               <div>Status</div>
             </div>
             {[...topPraiseThemes, ...topPainPoints].slice(0, 6).map((item, index) => {
               const isPositive = index < topPraiseThemes.length
-
               return (
-                <div
-                  className="relative grid grid-cols-[1.1fr_1.2fr_0.6fr] border-t border-black/8 px-5 py-4 text-[15px]"
+                <motion.div
+                  className={`grid grid-cols-[1.1fr_1.2fr_0.55fr] border-t border-black/[0.06] px-5 py-3.5 text-[14px] transition-colors ${
+                    index % 2 === 0 ? 'bg-white' : 'bg-[#fcfbf9]'
+                  } hover:bg-[#f7f5f0]`}
                   key={item}
+                  whileHover={{ x: 2 }}
                 >
-                  <div className="absolute inset-x-5 top-0 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.11)_1px,_transparent_1.5px)] bg-[length:8px_1px] bg-repeat-x opacity-80" />
-                  <div className="font-medium text-black">{item}</div>
-                  <div className="text-black/62">
+                  <div className="font-medium text-black pr-4">{item}</div>
+                  <div className="text-black/55 pr-4">
                     {isPositive
                       ? 'Frequently mentioned as a positive pattern across recent reviews.'
                       : 'Appears as a recurring friction point that should be monitored.'}
                   </div>
                   <div>
                     <span
-                      className={`rounded-full px-3 py-1 text-sm ${
-                        isPositive ? 'bg-[#eef5d2] text-[#48621b]' : 'bg-[#f7e6df] text-[#8f4b33]'
+                      className={`inline-block rounded-full px-3 py-1 text-[12px] font-medium ${
+                        isPositive
+                          ? 'bg-[#e8f5d4] text-[#3d6b1a]'
+                          : 'bg-[#fde8e2] text-[#8b3c27]'
                       }`}
                     >
                       {isPositive ? 'Positive' : 'Watch'}
                     </span>
                   </div>
-                </div>
+                </motion.div>
               )
             })}
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div
-          className="relative overflow-hidden rounded-[38px] border border-black/10 bg-white p-6 shadow-[0_18px_50px_rgba(25,25,25,0.04)]"
-          transition={{ duration: 0.24, ease: 'easeOut' }}
-          whileHover={{ y: -2 }}
-        >
-          <div className="absolute left-0 right-0 top-0 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.15)_1px,_transparent_1.5px)] bg-[length:9px_1px] bg-repeat-x" />
-          <div className="flex items-center justify-between gap-3">
-            <div className="text-3xl font-semibold tracking-tight">Risk summary</div>
+        {/* Risk summary */}
+        <div className="relative overflow-hidden rounded-[38px] border border-black/[0.07] bg-white p-6 shadow-[0_2px_1px_rgba(0,0,0,0.03),0_8px_24px_rgba(0,0,0,0.05)]">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.9),transparent_55%)]" />
+          <div className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(18,18,18,0.10)_30%,rgba(18,18,18,0.10)_70%,transparent)]" />
+          <div className="relative flex items-center justify-between gap-3">
+            <h3 className="text-[1.6rem] font-semibold tracking-tight text-black">Risk summary</h3>
             <motion.button
-              className="rounded-[20px] border border-black px-4 py-2 text-sm transition hover:bg-black hover:text-white"
+              className="rounded-[16px] border border-black/10 bg-[#f8f6f1] px-4 py-2 text-[13px] font-medium text-black/65 shadow-[0_2px_8px_rgba(18,18,18,0.05)] transition hover:bg-[#121212] hover:text-white"
               onClick={onSeeAllReviews}
               type="button"
-              whileHover={{ y: -2, scale: 1.01 }}
+              whileHover={{ y: -1, scale: 1.01 }}
               whileTap={{ scale: 0.98 }}
             >
               See all
             </motion.button>
           </div>
-          <div className="mt-6 text-6xl font-semibold tracking-tight">
-            {brief.averageRating.toFixed(1)}
+
+          <div className="relative mt-6">
+            <div className="text-[4.5rem] font-semibold tracking-[-0.06em] leading-none text-black">
+              {brief.averageRating.toFixed(1)}
+            </div>
+            <p className="mt-2 text-[13px] text-black/40 font-medium uppercase tracking-[0.22em]">Average rating</p>
           </div>
-          <div className="mt-1 text-black/45">Average rating from analyzed reviews</div>
+
           <motion.div
-            className="relative mt-7 overflow-hidden rounded-[28px] border border-[#d8e24f] bg-[#eef257] p-5 shadow-[0_16px_34px_rgba(214,225,79,0.18)]"
+            className="relative mt-6 overflow-hidden rounded-[24px] border border-[#cfd94a] bg-[linear-gradient(135deg,#eef257_0%,#e2e84a_100%)] p-5 shadow-[0_8px_24px_rgba(214,225,79,0.30)]"
             whileHover={{ y: -2, scale: 1.01 }}
           >
-            <div className="absolute inset-x-5 top-3 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.16)_1px,_transparent_1.5px)] bg-[length:8px_1px] bg-repeat-x" />
-            <div className="text-3xl font-semibold">{topBucket.value}</div>
-            <div className="mt-2 text-black/62">Reviews in the currently strongest visible segment</div>
+            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.25)_0%,transparent_50%)]" />
+            <div className="relative text-[2.6rem] font-semibold tracking-[-0.05em] leading-none">{topBucket.value}</div>
+            <div className="relative mt-2 text-[13px] text-black/60">Reviews in the strongest visible segment</div>
           </motion.div>
-          <div className="mt-5 space-y-3">
+
+          <div className="mt-5 space-y-2.5">
             {(brief.urgentFlags.length > 0 ? brief.urgentFlags : ['No urgent flags detected']).map((flag) => (
               <motion.div
-                className="rounded-[20px] border border-black/8 bg-[#fbfaf7] px-4 py-3 text-[15px] text-black/65 shadow-[0_8px_18px_rgba(18,18,18,0.03)]"
+                className="rounded-[18px] border border-black/[0.07] bg-[#fafaf8] px-4 py-3 text-[14px] text-black/60 shadow-[0_2px_8px_rgba(18,18,18,0.04)]"
                 key={flag}
-                whileHover={{ x: 2 }}
+                whileHover={{ x: 3 }}
               >
                 {flag}
               </motion.div>
             ))}
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   )
