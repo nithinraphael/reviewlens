@@ -59,6 +59,228 @@ const getStatusLabel = (review: TrustpilotReview) => {
   return 'Neutral'
 }
 
+const kIdleOrbs = [
+  {
+    className:
+      'left-[-4%] top-[-10%] h-40 w-40 bg-[radial-gradient(circle,rgba(232,242,85,0.95)_0%,rgba(232,242,85,0.18)_46%,transparent_72%)]',
+    duration: 8.4,
+  },
+  {
+    className:
+      'right-[-2%] top-[10%] h-36 w-36 bg-[radial-gradient(circle,rgba(255,214,153,0.9)_0%,rgba(255,214,153,0.16)_48%,transparent_72%)]',
+    duration: 9.2,
+  },
+  {
+    className:
+      'bottom-[-16%] left-[18%] h-48 w-48 bg-[radial-gradient(circle,rgba(197,239,209,0.88)_0%,rgba(197,239,209,0.14)_48%,transparent_74%)]',
+    duration: 10.1,
+  },
+] as const
+
+const kIdlePulseBars = [
+  'h-12',
+  'h-20',
+  'h-16',
+  'h-28',
+  'h-10',
+  'h-24',
+] as const
+
+const kIdleStatCards = [
+  {
+    title: 'Signal',
+    value: 'Patterns',
+    body: 'Themes begin clustering the moment reviews arrive.',
+    className: 'bg-[linear-gradient(180deg,#f5f8dd_0%,#eef4ca_100%)]',
+  },
+  {
+    title: 'Mood',
+    value: 'Sentiment',
+    body: 'Praise, friction, and urgency separate into clear tracks.',
+    className: 'bg-[linear-gradient(180deg,#fff8ef_0%,#f8ecdb_100%)]',
+  },
+  {
+    title: 'Output',
+    value: 'Brief',
+    body: 'A decision-ready narrative forms without asking for extra setup.',
+    className: 'bg-[linear-gradient(180deg,#ffffff_0%,#f6f2ea_100%)]',
+  },
+] as const
+
+const BIdleState: FC<{
+  eyebrow: string
+  title: string
+  body: string
+  accentLabel: string
+}> = ({ eyebrow, title, body, accentLabel }) => (
+  <div className="relative overflow-hidden rounded-[30px] border border-black/8 bg-[linear-gradient(145deg,#fffefb_0%,#f8f3e8_48%,#fdfbf5_100%)] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_24px_60px_rgba(18,18,18,0.05)]">
+    <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.6)_0%,transparent_24%,transparent_76%,rgba(255,255,255,0.3)_100%)]" />
+    <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.12)_1px,_transparent_1.4px)] bg-[length:8px_1px] bg-repeat-x opacity-80" />
+    {kIdleOrbs.map(({ className, duration }, index) => (
+      <motion.div
+        animate={{ x: [0, 10, -6, 0], y: [0, -12, 8, 0], scale: [1, 1.08, 0.94, 1] }}
+        className={`pointer-events-none absolute rounded-full blur-2xl ${className}`}
+        key={className}
+        transition={{
+          duration,
+          delay: index * 0.2,
+          repeat: Number.POSITIVE_INFINITY,
+          ease: 'easeInOut',
+        }}
+      />
+    ))}
+    <div className="relative overflow-hidden rounded-[26px] border border-black/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.86)_0%,rgba(255,252,245,0.92)_100%)] px-5 py-5 backdrop-blur-sm lg:px-6 lg:py-6">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.9),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(232,242,85,0.1),transparent_34%)]" />
+      <div className="relative grid gap-6 xl:grid-cols-[0.92fr_1.08fr] xl:items-center">
+        <div className="max-w-xl">
+          <div className="inline-flex items-center gap-2 rounded-full border border-black/8 bg-white/80 px-3 py-2 text-[11px] uppercase tracking-[0.3em] text-black/42 shadow-[0_8px_24px_rgba(18,18,18,0.04)]">
+            <motion.span
+              animate={{ scale: [1, 1.24, 1], opacity: [0.8, 1, 0.8] }}
+              className="h-2.5 w-2.5 rounded-full bg-[#e8f255]"
+              transition={{ duration: 1.8, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
+            />
+            {eyebrow}
+          </div>
+          <div className="mt-4 max-w-[16ch] text-[clamp(2.2rem,4vw,4.7rem)] font-semibold leading-[0.92] tracking-[-0.07em] text-black">
+            {title}
+          </div>
+          <p className="mt-4 max-w-[34rem] text-[16px] leading-7 text-black/60 lg:text-[18px] lg:leading-8">{body}</p>
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <div className="rounded-full border border-black/8 bg-[#121212] px-4 py-2 text-[13px] font-medium text-white shadow-[0_12px_28px_rgba(18,18,18,0.18)]">
+              {accentLabel}
+            </div>
+            <div className="rounded-full border border-black/8 bg-white/84 px-4 py-2 text-[13px] text-black/62">
+              waiting for first source URL
+            </div>
+          </div>
+          <div className="mt-7 grid gap-3 sm:grid-cols-3">
+            {kIdleStatCards.map(({ title: statTitle, value, body: statBody, className }, index) => (
+              <motion.div
+                animate={{ y: [0, index % 2 === 0 ? -6 : 6, 0] }}
+                className={`rounded-[22px] border border-black/8 p-4 shadow-[0_14px_30px_rgba(18,18,18,0.05)] ${className}`}
+                key={`${accentLabel}-${statTitle}`}
+                transition={{
+                  duration: 3 + index * 0.4,
+                  delay: index * 0.14,
+                  repeat: Number.POSITIVE_INFINITY,
+                  ease: 'easeInOut',
+                }}
+              >
+                <div className="text-[10px] uppercase tracking-[0.24em] text-black/38">{statTitle}</div>
+                <div className="mt-3 text-[22px] font-semibold tracking-[-0.05em] text-black">{value}</div>
+                <div className="mt-2 text-[13px] leading-6 text-black/58">{statBody}</div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+        <div className="relative min-h-[340px]">
+          <motion.div
+            animate={{ y: [0, -8, 0], rotate: [0, 1.2, 0] }}
+            className="absolute inset-x-0 top-6 mx-auto w-[min(100%,34rem)] rounded-[32px] border border-black/10 bg-[linear-gradient(180deg,#121212_0%,#1a1a1a_100%)] p-6 text-white shadow-[0_34px_80px_rgba(18,18,18,0.24)]"
+            transition={{ duration: 4.2, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <div className="text-[11px] uppercase tracking-[0.3em] text-white/38">Live canvas</div>
+                <div className="mt-3 text-[34px] font-semibold tracking-[-0.06em]">{accentLabel}</div>
+              </div>
+              <div className="rounded-full border border-white/10 bg-white/8 px-3 py-2 text-[12px] text-white/72">
+                warming up
+              </div>
+            </div>
+            <div className="mt-8 grid gap-4 md:grid-cols-[1.05fr_0.95fr]">
+              <div className="rounded-[24px] border border-white/10 bg-white/[0.04] p-4">
+                <div className="text-[11px] uppercase tracking-[0.24em] text-white/34">Incoming pulse</div>
+                <div className="mt-5 flex h-28 items-end gap-2">
+                  {kIdlePulseBars.map((heightClass, index) => (
+                    <motion.div
+                      animate={{ scaleY: [1, 1.22, 0.88, 1] }}
+                      className={`w-full origin-bottom rounded-full bg-[linear-gradient(180deg,#f7f9d1_0%,#d6df58_100%)] ${heightClass}`}
+                      key={`${accentLabel}-${heightClass}`}
+                      transition={{
+                        duration: 1.8,
+                        delay: index * 0.08,
+                        repeat: Number.POSITIVE_INFINITY,
+                        ease: 'easeInOut',
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-3">
+                <motion.div
+                  animate={{ x: [0, 10, 0] }}
+                  className="rounded-[22px] border border-white/10 bg-white/[0.05] p-4"
+                  transition={{ duration: 3.2, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
+                >
+                  <div className="text-[11px] uppercase tracking-[0.24em] text-white/34">Clustering</div>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {['pricing friction', 'delight moments', 'service lag', 'trust cues'].map((item) => (
+                      <span
+                        className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-2 text-[12px] text-white/72"
+                        key={item}
+                      >
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </motion.div>
+                <motion.div
+                  animate={{ x: [0, -8, 0], y: [0, 4, 0] }}
+                  className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.1)_0%,rgba(255,255,255,0.04)_100%)] p-4"
+                  transition={{ duration: 3.8, delay: 0.12, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <div className="text-[11px] uppercase tracking-[0.24em] text-white/34">Narrative draft</div>
+                      <div className="mt-2 text-[18px] font-medium tracking-[-0.04em] text-white">
+                        The workspace is poised to turn noise into direction.
+                      </div>
+                    </div>
+                    <motion.div
+                      animate={{ rotate: [0, 180, 360] }}
+                      className="flex h-11 w-11 items-center justify-center rounded-full border border-white/12 bg-white/[0.07] text-[18px]"
+                      transition={{ duration: 10, repeat: Number.POSITIVE_INFINITY, ease: 'linear' }}
+                    >
+                      +
+                    </motion.div>
+                  </div>
+                </motion.div>
+              </div>
+            </div>
+          </motion.div>
+          <motion.div
+            animate={{ y: [0, 6, 0], rotate: [0, -2, 0] }}
+            className="absolute bottom-3 left-4 rounded-[24px] border border-black/8 bg-white/86 px-4 py-4 shadow-[0_18px_36px_rgba(18,18,18,0.08)] backdrop-blur-sm"
+            transition={{ duration: 3.6, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
+          >
+            <div className="text-[10px] uppercase tracking-[0.24em] text-black/34">Mood index</div>
+            <div className="mt-2 flex items-end gap-2">
+              {['h-6', 'h-10', 'h-8', 'h-12'].map((heightClass, index) => (
+                <motion.div
+                  animate={{ scaleY: [1, 1.16, 1] }}
+                  className={`w-3 origin-bottom rounded-full ${heightClass} ${
+                    index === 1 || index === 3 ? 'bg-[#121212]' : 'bg-[#e8f255]'
+                  }`}
+                  key={`${accentLabel}-${heightClass}`}
+                  transition={{ duration: 1.7, delay: index * 0.1, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
+                />
+              ))}
+            </div>
+          </motion.div>
+          <motion.div
+            animate={{ y: [0, -6, 0], x: [0, 8, 0] }}
+            className="absolute bottom-8 right-3 rounded-full border border-black/8 bg-[#f7f1e6] px-4 py-3 text-[12px] uppercase tracking-[0.24em] text-black/55 shadow-[0_14px_28px_rgba(18,18,18,0.08)]"
+            transition={{ duration: 3.4, delay: 0.2, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
+          >
+            no dead air
+          </motion.div>
+        </div>
+      </div>
+    </div>
+  </div>
+)
+
 export const BAppShell: FC = () => {
   const brief = useReviewStore((state) => state.brief)
   const chatMessages = useReviewStore((state) => state.chatMessages)
@@ -323,9 +545,12 @@ export const BAppShell: FC = () => {
                         ))}
                       </div>
                     ) : (
-                      <div className="rounded-[26px] border border-dashed border-black/10 bg-[#fbfaf7] px-5 py-8 text-black/48">
-                        Run an analysis to populate the live review table.
-                      </div>
+                      <BIdleState
+                        accentLabel="Fresh reviews"
+                        body="Drop in a Trustpilot URL and we’ll start collecting the strongest praise, sharpest complaints, and patterns worth chasing."
+                        eyebrow="Review stream"
+                        title="Nothing in the feed yet"
+                      />
                     )}
                   </motion.div>
                 </section>
@@ -345,8 +570,13 @@ export const BAppShell: FC = () => {
                       <div className="absolute left-0 right-0 top-0 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.15)_1px,_transparent_1.5px)] bg-[length:9px_1px] bg-repeat-x" />
                       <p className="text-sm uppercase tracking-[0.28em] text-black/35">Briefing</p>
                       <h2 className="mt-1 text-4xl font-semibold tracking-tight">Auto brief</h2>
-                      <div className="mt-5 rounded-[26px] border border-dashed border-black/10 bg-[#fbfaf7] px-5 py-8 text-black/48">
-                        The auto-generated brief will appear here after you run an analysis.
+                      <div className="mt-5">
+                        <BIdleState
+                          accentLabel="Exec summary"
+                          body="Once reviews land, this panel will turn them into pain points, praise themes, urgent flags, and a clean narrative you can share."
+                          eyebrow="Brief engine"
+                          title="Waiting to write the story"
+                        />
                       </div>
                     </motion.div>
                   )}
