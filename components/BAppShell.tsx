@@ -499,16 +499,19 @@ export const BAppShell: FC = () => {
 
               <div className="grid gap-6">
                 <section ref={reviewsRef}>
-                  <motion.div {...kPanelMotion} className="relative overflow-hidden rounded-[34px] border border-black/10 bg-white p-6 shadow-[0_18px_50px_rgba(25,25,25,0.04)] lg:p-8">
-                    <div className="absolute left-0 right-0 top-0 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.15)_1px,_transparent_1.5px)] bg-[length:9px_1px] bg-repeat-x" />
-                    <div className="mb-5 flex items-center justify-between gap-3">
-                      <div>
-                        <p className="text-sm uppercase tracking-[0.28em] text-black/35">Reviews</p>
-                        <h2 className="mt-1 text-4xl font-semibold tracking-tight">Recent review feed</h2>
+                  {reviews.length > 0 ? (
+                    <motion.div
+                      {...kPanelMotion}
+                      className="relative overflow-hidden rounded-[34px] border border-black/10 bg-white p-6 shadow-[0_18px_50px_rgba(25,25,25,0.04)] lg:p-8"
+                    >
+                      <div className="absolute left-0 right-0 top-0 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.15)_1px,_transparent_1.5px)] bg-[length:9px_1px] bg-repeat-x" />
+                      <div className="mb-5 flex items-center justify-between gap-3">
+                        <div>
+                          <p className="text-sm uppercase tracking-[0.28em] text-black/35">Reviews</p>
+                          <h2 className="mt-1 text-4xl font-semibold tracking-tight">Recent review feed</h2>
+                        </div>
+                        <div className="bg-[#e8f255] px-3 py-1 text-sm">{reviews.length}</div>
                       </div>
-                      <div className="bg-[#e8f255] px-3 py-1 text-sm">{reviews.length}</div>
-                    </div>
-                    {reviews.length > 0 ? (
                       <div className="overflow-hidden rounded-[26px] border border-black/8">
                         <div className="grid grid-cols-[1fr_120px_140px_120px] border-b border-black/8 bg-[#f8f6f1] px-5 py-3 text-sm uppercase tracking-[0.2em] text-black/42">
                           <div>Review</div>
@@ -544,15 +547,17 @@ export const BAppShell: FC = () => {
                           </div>
                         ))}
                       </div>
-                    ) : (
+                    </motion.div>
+                  ) : (
+                    <motion.div {...kPanelMotion}>
                       <BIdleState
                         accentLabel="Fresh reviews"
                         body="Drop in a Trustpilot URL and we’ll start collecting the strongest praise, sharpest complaints, and patterns worth chasing."
                         eyebrow="Review stream"
                         title="Nothing in the feed yet"
                       />
-                    )}
-                  </motion.div>
+                    </motion.div>
+                  )}
                 </section>
 
               <section ref={briefingRef}>
@@ -565,21 +570,7 @@ export const BAppShell: FC = () => {
                         reviews={reviews}
                       />
                     </motion.div>
-                  ) : (
-                    <motion.div {...kPanelMotion} className="relative overflow-hidden rounded-[34px] border border-black/10 bg-white p-6 shadow-[0_18px_50px_rgba(25,25,25,0.04)] lg:p-8">
-                      <div className="absolute left-0 right-0 top-0 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.15)_1px,_transparent_1.5px)] bg-[length:9px_1px] bg-repeat-x" />
-                      <p className="text-sm uppercase tracking-[0.28em] text-black/35">Briefing</p>
-                      <h2 className="mt-1 text-4xl font-semibold tracking-tight">Auto brief</h2>
-                      <div className="mt-5">
-                        <BIdleState
-                          accentLabel="Exec summary"
-                          body="Once reviews land, this panel will turn them into pain points, praise themes, urgent flags, and a clean narrative you can share."
-                          eyebrow="Brief engine"
-                          title="Waiting to write the story"
-                        />
-                      </div>
-                    </motion.div>
-                  )}
+                  ) : null}
                 </AnimatePresence>
               </section>
               </div>
