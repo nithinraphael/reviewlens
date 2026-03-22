@@ -10,142 +10,166 @@ import type { AnalystMode, ReviewBrief, TrustpilotReview } from '@/types'
 
 const styles = StyleSheet.create({
   page: {
-    padding: 28,
-    backgroundColor: '#f6f4ef',
-    color: '#121212',
-    fontSize: 12,
+    paddingTop: 28,
+    paddingRight: 32,
+    paddingBottom: 28,
+    paddingLeft: 32,
+    backgroundColor: '#ffffff',
+    color: '#111111',
+    fontSize: 10,
     fontFamily: 'Helvetica',
   },
-  stack: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 16,
-  },
-  card: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 18,
-    border: '1 solid #e7e2d8',
-  },
-  eyebrow: {
-    fontSize: 10,
-    letterSpacing: 2,
-    textTransform: 'uppercase',
-    color: '#7c766f',
-    marginBottom: 6,
-  },
-  heroTitle: {
-    fontSize: 28,
+  reportTitle: {
+    fontSize: 18,
     fontWeight: 700,
+    letterSpacing: 0.3,
   },
-  heroRow: {
+  reportMeta: {
+    marginTop: 8,
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: 12,
+    borderTop: '1 solid #111111',
+    borderBottom: '1 solid #111111',
+    paddingTop: 6,
+    paddingBottom: 6,
   },
-  chips: {
-    display: 'flex',
-    flexDirection: 'row',
-    gap: 10,
+  metaItem: {
+    width: '32%',
   },
-  chip: {
-    backgroundColor: '#f8f6f1',
-    borderRadius: 12,
-    padding: 12,
-    minWidth: 90,
-  },
-  chipLabel: {
-    fontSize: 9,
+  metaLabel: {
+    fontSize: 8,
     textTransform: 'uppercase',
-    color: '#7c766f',
-    letterSpacing: 1.5,
+    letterSpacing: 0.8,
+    color: '#333333',
   },
-  chipValue: {
-    marginTop: 6,
-    fontSize: 20,
-    fontWeight: 700,
+  metaValue: {
+    marginTop: 2,
+    fontSize: 10,
+    fontWeight: 600,
+  },
+  section: {
+    marginTop: 14,
   },
   sectionTitle: {
-    fontSize: 22,
+    fontSize: 11,
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
     fontWeight: 700,
-    marginTop: 4,
+    paddingBottom: 4,
+    borderBottom: '1 solid #111111',
   },
-  summary: {
-    marginTop: 10,
-    color: '#4b4741',
-    lineHeight: 1.6,
+  paragraph: {
+    marginTop: 8,
+    lineHeight: 1.45,
+    color: '#1f1f1f',
+  },
+  statGrid: {
+    marginTop: 8,
+    display: 'flex',
+    flexDirection: 'row',
+    borderTop: '1 solid #222222',
+    borderLeft: '1 solid #222222',
+  },
+  statCell: {
+    width: '33.333%',
+    borderRight: '1 solid #222222',
+    borderBottom: '1 solid #222222',
+    padding: 8,
+  },
+  statLabel: {
+    fontSize: 8,
+    textTransform: 'uppercase',
+    color: '#333333',
+    letterSpacing: 0.8,
+  },
+  statValue: {
+    marginTop: 4,
+    fontSize: 14,
+    fontWeight: 700,
   },
   twoCol: {
     display: 'flex',
     flexDirection: 'row',
-    gap: 14,
-    marginTop: 14,
+    gap: 10,
+    marginTop: 8,
   },
-  panel: {
+  column: {
     flex: 1,
-    backgroundColor: '#fbfaf7',
-    borderRadius: 12,
-    padding: 14,
-    border: '1 solid #ebe6dc',
+    border: '1 solid #222222',
+    padding: 8,
   },
-  listItem: {
-    color: '#4b4741',
-    lineHeight: 1.6,
-    marginTop: 6,
+  columnTitle: {
+    fontSize: 9,
+    textTransform: 'uppercase',
+    letterSpacing: 0.7,
+    fontWeight: 700,
+    borderBottom: '1 solid #222222',
+    paddingBottom: 4,
+  },
+  bulletItem: {
+    marginTop: 5,
+    lineHeight: 1.4,
   },
   tableHeader: {
+    marginTop: 8,
     display: 'flex',
     flexDirection: 'row',
-    backgroundColor: '#f8f6f1',
-    borderBottom: '1 solid #ebe6dc',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    color: '#7c766f',
-    fontSize: 10,
+    borderTop: '1 solid #222222',
+    borderLeft: '1 solid #222222',
+    borderRight: '1 solid #222222',
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    fontSize: 8,
     textTransform: 'uppercase',
+    letterSpacing: 0.7,
+    fontWeight: 700,
   },
   tableRow: {
     display: 'flex',
     flexDirection: 'row',
-    borderBottom: '1 solid #f0ebe2',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    borderLeft: '1 solid #222222',
+    borderRight: '1 solid #222222',
+    borderBottom: '1 solid #222222',
+    paddingVertical: 6,
+    paddingHorizontal: 8,
   },
-  colAuthor: { width: '24%' },
-  colRating: { width: '14%' },
-  colDate: { width: '18%' },
-  colPreview: { width: '44%' },
-  messageList: {
-    marginTop: 12,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 10,
+  cellAuthor: {
+    width: '22%',
+    paddingRight: 4,
   },
-  message: {
-    borderRadius: 12,
-    border: '1 solid #ebe6dc',
-    padding: 12,
-    backgroundColor: '#ffffff',
+  cellRating: {
+    width: '12%',
+    paddingRight: 4,
   },
-  userMessage: {
-    backgroundColor: '#121212',
-    color: '#ffffff',
-    border: '1 solid #121212',
+  cellDate: {
+    width: '16%',
+    paddingRight: 4,
   },
-  messageRole: {
-    fontSize: 9,
+  cellPreview: {
+    width: '50%',
+  },
+  transcriptRow: {
+    marginTop: 8,
+    border: '1 solid #222222',
+    padding: 8,
+  },
+  transcriptRole: {
+    fontSize: 8,
     textTransform: 'uppercase',
-    letterSpacing: 1.5,
-    opacity: 0.6,
-    marginBottom: 6,
+    letterSpacing: 0.7,
+    fontWeight: 700,
   },
-  empty: {
-    marginTop: 12,
-    padding: 12,
-    borderRadius: 12,
-    border: '1 dashed #d8d1c6',
-    color: '#7c766f',
+  transcriptText: {
+    marginTop: 4,
+    lineHeight: 1.4,
+  },
+  footer: {
+    marginTop: 14,
+    borderTop: '1 solid #111111',
+    paddingTop: 6,
+    fontSize: 8,
+    color: '#444444',
   },
 })
 
@@ -156,8 +180,22 @@ const formatDate = (value: string) =>
     year: 'numeric',
   })
 
+const getSafeNumber = (value: number, fallback: number) =>
+  Number.isFinite(value) ? value : fallback
+
 const renderList = (items: readonly string[]) =>
   items.length > 0 ? items : ['No items available']
+
+const getPreview = ({ title, body }: TrustpilotReview) => {
+  const source = (title || body || '').replace(/\s+/g, ' ').trim()
+  if (!source) return 'N/A'
+  return source.length > 140 ? `${source.slice(0, 140)}...` : source
+}
+
+const toDisplayRating = (rating: number) => `${getSafeNumber(rating, 0).toFixed(1).replace(/\.0$/, '')}/5`
+
+const kMaxReviewsInExport = 25
+const kMaxMessagesInExport = 20
 
 export const BExportDocument = ({
   brief,
@@ -170,107 +208,108 @@ export const BExportDocument = ({
   mode: AnalystMode
   reviews: readonly TrustpilotReview[]
 }) => (
-  <Document title="ReviewLens Export">
+  <Document title="ReviewLens Standard Report">
     <Page size="A4" style={styles.page}>
-      <View style={styles.stack}>
-        <View style={styles.card}>
-          <View style={styles.heroRow}>
-            <View>
-              <Text style={styles.eyebrow}>ReviewLens Export</Text>
-              <Text style={styles.heroTitle}>Review intelligence report</Text>
-            </View>
-            <View style={styles.chips}>
-              <View style={styles.chip}>
-                <Text style={styles.chipLabel}>Mode</Text>
-                <Text style={styles.chipValue}>{mode}</Text>
-              </View>
-              <View style={styles.chip}>
-                <Text style={styles.chipLabel}>Reviews</Text>
-                <Text style={styles.chipValue}>{reviews.length}</Text>
-              </View>
-              <View style={styles.chip}>
-                <Text style={styles.chipLabel}>Avg rating</Text>
-                <Text style={styles.chipValue}>{brief.averageRating.toFixed(1)}</Text>
-              </View>
-            </View>
+      <Text style={styles.reportTitle}>Customer Review Analysis Report</Text>
+      <View style={styles.reportMeta}>
+        <View style={styles.metaItem}>
+          <Text style={styles.metaLabel}>Report date</Text>
+          <Text style={styles.metaValue}>{formatDate(new Date().toISOString())}</Text>
+        </View>
+        <View style={styles.metaItem}>
+          <Text style={styles.metaLabel}>Mode</Text>
+          <Text style={styles.metaValue}>{mode.toUpperCase()}</Text>
+        </View>
+        <View style={styles.metaItem}>
+          <Text style={styles.metaLabel}>Sample size</Text>
+          <Text style={styles.metaValue}>{reviews.length} reviews</Text>
+        </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>1. Executive summary</Text>
+        <Text style={styles.paragraph}>{brief.summary || 'Summary not available.'}</Text>
+        <View style={styles.statGrid}>
+          <View style={styles.statCell}>
+            <Text style={styles.statLabel}>Review count</Text>
+            <Text style={styles.statValue}>{getSafeNumber(brief.reviewCount, reviews.length)}</Text>
+          </View>
+          <View style={styles.statCell}>
+            <Text style={styles.statLabel}>Average rating</Text>
+            <Text style={styles.statValue}>{getSafeNumber(brief.averageRating, 0).toFixed(1)}</Text>
+          </View>
+          <View style={styles.statCell}>
+            <Text style={styles.statLabel}>Urgent flags</Text>
+            <Text style={styles.statValue}>{brief.urgentFlags.length}</Text>
           </View>
         </View>
+      </View>
 
-        <View style={styles.card}>
-          <Text style={styles.eyebrow}>Executive summary</Text>
-          <Text style={styles.sectionTitle}>Brief overview</Text>
-          <Text style={styles.summary}>{brief.summary}</Text>
-          <View style={styles.twoCol}>
-            <View style={styles.panel}>
-              <Text style={styles.eyebrow}>Pain points</Text>
-              {renderList(brief.painPoints).map((item) => (
-                <Text key={item} style={styles.listItem}>
-                  • {item}
-                </Text>
-              ))}
-            </View>
-            <View style={styles.panel}>
-              <Text style={styles.eyebrow}>Praise themes</Text>
-              {renderList(brief.praiseThemes).map((item) => (
-                <Text key={item} style={styles.listItem}>
-                  • {item}
-                </Text>
-              ))}
-            </View>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>2. Key findings</Text>
+        <View style={styles.twoCol}>
+          <View style={styles.column}>
+            <Text style={styles.columnTitle}>Pain points</Text>
+            {renderList(brief.painPoints).map((item, index) => (
+              <Text key={`${item}-${index}`} style={styles.bulletItem}>
+                • {item}
+              </Text>
+            ))}
+          </View>
+          <View style={styles.column}>
+            <Text style={styles.columnTitle}>Praise themes</Text>
+            {renderList(brief.praiseThemes).map((item, index) => (
+              <Text key={`${item}-${index}`} style={styles.bulletItem}>
+                • {item}
+              </Text>
+            ))}
           </View>
         </View>
-
-        <View style={styles.card}>
-          <Text style={styles.eyebrow}>Risk summary</Text>
-          <Text style={styles.sectionTitle}>Urgent flags</Text>
-          {renderList(brief.urgentFlags).map((item) => (
-            <Text key={item} style={styles.listItem}>
+        <View style={styles.column}>
+          <Text style={styles.columnTitle}>Urgent flags</Text>
+          {renderList(brief.urgentFlags).map((item, index) => (
+            <Text key={`${item}-${index}`} style={styles.bulletItem}>
               • {item}
             </Text>
           ))}
         </View>
-
-        <View style={styles.card}>
-          <Text style={styles.eyebrow}>Reviews</Text>
-          <Text style={styles.sectionTitle}>Recent review feed</Text>
-          <View style={styles.tableHeader}>
-            <Text style={styles.colAuthor}>Author</Text>
-            <Text style={styles.colRating}>Rating</Text>
-            <Text style={styles.colDate}>Date</Text>
-            <Text style={styles.colPreview}>Preview</Text>
-          </View>
-          {reviews.slice(0, 10).map((review) => (
-            <View key={review.id} style={styles.tableRow}>
-              <Text style={styles.colAuthor}>{review.author}</Text>
-              <Text style={styles.colRating}>{review.rating.toFixed(1).replace(/\.0$/, '')}/5</Text>
-              <Text style={styles.colDate}>{formatDate(review.date)}</Text>
-              <Text style={styles.colPreview}>{(review.title || review.body).slice(0, 110)}</Text>
-            </View>
-          ))}
-        </View>
-
-        <View style={styles.card}>
-          <Text style={styles.eyebrow}>Conversation</Text>
-          <Text style={styles.sectionTitle}>Chat transcript</Text>
-          <View style={styles.messageList}>
-            {messages.length > 0 ? (
-              messages.map(({ role, content }, index) => (
-                <View
-                  key={`${role}-${index}`}
-                  style={role === 'user' ? [styles.message, styles.userMessage] : styles.message}
-                >
-                  <Text style={styles.messageRole}>{role === 'user' ? 'You' : 'ReviewLens'}</Text>
-                  <Text>{content}</Text>
-                </View>
-              ))
-            ) : (
-              <View style={styles.empty}>
-                <Text>No chat transcript captured yet.</Text>
-              </View>
-            )}
-          </View>
-        </View>
       </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>3. Review sample</Text>
+        <View style={styles.tableHeader}>
+          <Text style={styles.cellAuthor}>Author</Text>
+          <Text style={styles.cellRating}>Rating</Text>
+          <Text style={styles.cellDate}>Date</Text>
+          <Text style={styles.cellPreview}>Review excerpt</Text>
+        </View>
+        {reviews.slice(0, kMaxReviewsInExport).map((review) => (
+          <View key={review.id} style={styles.tableRow}>
+            <Text style={styles.cellAuthor}>{review.author || 'N/A'}</Text>
+            <Text style={styles.cellRating}>{toDisplayRating(review.rating)}</Text>
+            <Text style={styles.cellDate}>{formatDate(review.date)}</Text>
+            <Text style={styles.cellPreview}>{getPreview(review)}</Text>
+          </View>
+        ))}
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>4. Analyst transcript (optional)</Text>
+        {messages.length > 0 ? (
+          messages.slice(0, kMaxMessagesInExport).map(({ role, content }, index) => (
+            <View key={`${role}-${index}`} style={styles.transcriptRow}>
+              <Text style={styles.transcriptRole}>{role === 'user' ? 'Analyst' : 'Assistant'}</Text>
+              <Text style={styles.transcriptText}>{content || 'N/A'}</Text>
+            </View>
+          ))
+        ) : (
+          <View style={styles.transcriptRow}>
+            <Text style={styles.transcriptText}>No transcript entries available.</Text>
+          </View>
+        )}
+      </View>
+
+      <Text style={styles.footer}>Generated by ReviewLens · Standardized industrial report layout</Text>
     </Page>
   </Document>
 )
