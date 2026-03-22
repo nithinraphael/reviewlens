@@ -145,13 +145,8 @@ const BIdleState: FC<{
             {title}
           </div>
           <p className="mt-4 max-w-[34rem] text-[16px] leading-7 text-black/60 lg:text-[18px] lg:leading-8">{body}</p>
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <div className="rounded-full border border-black/8 bg-[#121212] px-4 py-2 text-[13px] font-medium text-white shadow-[0_12px_28px_rgba(18,18,18,0.18)]">
-              {accentLabel}
-            </div>
-            <div className="rounded-full border border-black/8 bg-white/84 px-4 py-2 text-[13px] text-black/62">
-              waiting for first source URL
-            </div>
+          <div className="mt-6 max-w-3xl">
+            <BUrlInput />
           </div>
           <div className="mt-7 grid gap-3 sm:grid-cols-3">
             {kIdleStatCards.map(({ title: statTitle, value, body: statBody, className }, index) => (
@@ -439,8 +434,7 @@ export const BAppShell: FC = () => {
         <section className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-[#fbfaf7]">
           <header className="relative shrink-0 border-b border-black/8 px-6 py-5 lg:px-10">
             <div className="absolute inset-x-10 bottom-0 h-px bg-[radial-gradient(circle,_rgba(18,18,18,0.16)_1px,_transparent_1.5px)] bg-[length:9px_1px] bg-repeat-x opacity-70" />
-            <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
-              <BUrlInput />
+            <div className="flex items-center justify-end">
               <div className="flex flex-wrap items-center gap-3">
                 <BModeToggle mode={mode} onChange={handleModeChange} />
                 <BExportButton
@@ -450,15 +444,6 @@ export const BAppShell: FC = () => {
                   mode={mode}
                   reviews={reviews}
                 />
-                <motion.button
-                  className="flex h-12 w-12 items-center justify-center rounded-full bg-[#e8f255] text-sm font-semibold shadow-[0_12px_24px_rgba(232,242,85,0.28)]"
-                  onClick={() => scrollToSection('dashboard')}
-                  type="button"
-                  whileHover={{ y: -2, scale: 1.04 }}
-                  whileTap={{ scale: 0.97 }}
-                >
-                  RL
-                </motion.button>
               </div>
             </div>
           </header>
