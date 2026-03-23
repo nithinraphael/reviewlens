@@ -2,6 +2,15 @@
 
 ## How It Works
 
+### GitHub
+[ReviewLens Repository](https://github.com/nithinraphael/reviewlens)
+
+### Website
+[ReviewLens Website](https://reviewlens-iota.vercel.app/)
+
+### Demo
+[Watch Demo on YouTube](https://youtu.be/XnDQ_RzFadk)
+
 ```
 INGEST  User → URL → Scraper (Firecrawl) → Embed → Store → Generate Brief
                                                    └── Zustand with persistence
