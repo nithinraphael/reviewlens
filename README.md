@@ -2,6 +2,8 @@
 
 ## How It Works
 
+The API keys used are free/trial versions. Please contact [nithin.raphael96@gmail.com](mailto:nithin.raphael96@gmail.com) if things are not working.
+
 ### GitHub
 [ReviewLens Repository](https://github.com/nithinraphael/reviewlens)
 
@@ -10,6 +12,7 @@
 
 ### Demo
 [Watch Demo on YouTube](https://youtu.be/XnDQ_RzFadk)
+
 
 ```
 INGEST  User → URL → Scraper (Firecrawl) → Embed → Store → Generate Brief
